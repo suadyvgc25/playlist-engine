@@ -1,5 +1,8 @@
 import { useState } from "react";
 import type { Track } from "./types/track";
+import { Routes, Route, Navigate } from "react-router-dom";
+import CallbackPage from "./pages/CallbackPage";
+import HomePage from "./pages/HomePage";
 import Header from "./components/Header/Header";
 import SearchBar from "./components/SearchBar/SearchBar";
 import SearchResults from "./components/SearchResults/SearchResults";
@@ -42,32 +45,42 @@ export default function App() {
   const playlistCount = playlistTracks.length;
 
   return (
-    <div className={styles.appShell}>
-      <Header />
 
-      <main className={styles.main}>
-        <section className={styles.leftCol} aria-label="Search and results">
-          <h2 className={styles.sectionTitle}>Browse Music</h2>
-          <SearchBar />
-          <SearchResults
-            tracks={mockTracks}
-            onAdd={addTrack}
-            resultsCount={resultsCount}
-          />
-        </section>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <div className={styles.appShell}>
+            <Header />
 
-        <section className={styles.rightCol} aria-label="Playlist builder">
-          <h2 className={styles.sectionTitle}>Playlist Builder</h2>
-          <Playlist
-            name={playlistName}
-            tracks={playlistTracks}
-            onNameChange={handlePlaylistNameChange}
-            onRemove={removeTrack}
-            onClear={clearPlaylist}
-            playlistCount={playlistCount}
-          />
-        </section>
-      </main>
-    </div>
+            <main className={styles.main}>
+              <section className={styles.leftCol} aria-label="Search and results">
+                <h2 className={styles.sectionTitle}>Browse Music</h2>
+                <SearchBar />
+                <SearchResults
+                  tracks={mockTracks}
+                  onAdd={addTrack}
+                  resultsCount={resultsCount}
+                />
+              </section>
+
+              <section className={styles.rightCol} aria-label="Playlist builder">
+                <h2 className={styles.sectionTitle}>Playlist Builder</h2>
+                <Playlist
+                  name={playlistName}
+                  tracks={playlistTracks}
+                  onNameChange={handlePlaylistNameChange}
+                  onRemove={removeTrack}
+                  onClear={clearPlaylist}
+                  playlistCount={playlistCount}
+                />
+              </section>
+            </main>
+          </div>
+        }
+      />
+      <Route path="/callback" element={<CallbackPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
