@@ -180,3 +180,9 @@ export async function getValidAccessToken(): Promise<string | null> {
 
   return tokens.accessToken;
 }
+
+export async function requireAccessToken(): Promise<string> {
+  const token = await getValidAccessToken();
+  if (!token) throw new Error("User not logged in to Spotify.");
+  return token;
+}
