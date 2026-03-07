@@ -14,15 +14,22 @@ export default function SearchBar({
   loading,
 }: Props) { 
 
-  
   return (
     <div className={styles.searchBar}>
       <input
         type="text"
         placeholder="Search for songs or artists..."
         className={styles.input}
+        value={query}
+        onChange={(e) => onQueryChange(e.target.value)}
       />
-      <button className={styles.button}>Search</button>
+      <button
+        className={styles.button}
+        onClick={onSearch}
+        disabled={loading}
+      >
+        {loading ? "Searching..." : "Search"}
+      </button>
     </div>
   );
 }
