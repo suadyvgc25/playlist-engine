@@ -1,4 +1,3 @@
-// src/services/spotify/api.ts
 import { requireAccessToken } from "./auth";
 
 const SPOTIFY_BASE_URL = "https://api.spotify.com/v1";
@@ -28,7 +27,7 @@ export async function spotifyFetch<T>(
     },
   });
 
-  // Handle rate limit (429)
+  // Handle rate limit 429)
   if (res.status === 429) {
     const retryAfter = res.headers.get("Retry-After");
     throw new SpotifyApiError(
@@ -37,7 +36,6 @@ export async function spotifyFetch<T>(
     );
   }
 
-  // Try to parse error bodies (Spotify usually returns JSON)
   let data: any = null;
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {

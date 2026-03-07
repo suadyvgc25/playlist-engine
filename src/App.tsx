@@ -10,9 +10,9 @@ import Playlist from "./components/Playlist/Playlist";
 import styles from "./App.module.scss";
 
 const mockTracks: Track[] = [
-  { id: "1", name: "Blinding Lights", artist: "The Weeknd" },
-  { id: "2", name: "Levitating", artist: "Dua Lipa" },
-  { id: "3", name: "Watermelon Sugar", artist: "Harry Styles" },
+  { id: "1", name: "Blinding Lights", artist: "The Weeknd", album: "Meowlancholy", uri: "spotify:track:0VjIjW4GlUZAMYd2vXMi3b" },
+  { id: "2", name: "Levitating", artist: "Dua Lipa", album: "Future Nostalgia", uri: "spotify:track:463CkQjx2Zk1yXoBuierM9" },
+  { id: "3", name: "Watermelon Sugar", artist: "Harry Styles", album: "Fine Line", uri: "spotify:track:463CkQjx2Zk1yXoBuierM9" },
 ];
 
 export default function App() {
