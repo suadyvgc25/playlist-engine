@@ -5,6 +5,9 @@ type Props = {
   tracks: Track[];
   onAdd: (track: Track) => void;
   resultsCount: number;
+  loading?: boolean;
+  error?: string | null;
+  query?: string;
 };
 
 export default function SearchResults({
