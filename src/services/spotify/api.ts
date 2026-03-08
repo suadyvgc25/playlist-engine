@@ -17,9 +17,11 @@ export async function spotifyFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+
   const token = await requireAccessToken();
-  console.log("Access token from storage:", token);
+  
   const res = await fetch(`${SPOTIFY_BASE_URL}${path}`, {
+    method: "GET",
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -45,8 +47,6 @@ export async function spotifyFetch<T>(
   }
 
   if (!res.ok) {
-    console.error("Spotify error status:", res.status);
-    console.error("Spotify error body:", data);
     // 401 means token invalid/expired
     const message =
       res.status === 401
@@ -54,11 +54,6 @@ export async function spotifyFetch<T>(
         : `Spotify API error (${res.status}).`;
 
     throw new SpotifyApiError(message, res.status, data);
-    // throw new SpotifyApiError(
-    //   data?.error?.message || `Spotify API error (${res.status})`,
-    //   res.status,
-    //   data
-    // );
   }
 
   return data as T;
