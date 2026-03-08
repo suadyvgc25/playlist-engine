@@ -186,3 +186,7 @@ export async function requireAccessToken(): Promise<string> {
   if (!token) throw new Error("User not logged in to Spotify.");
   return token;
 }
+
+export function logout() {
+  sessionStorage.removeItem(TOKENS_KEY);
+}

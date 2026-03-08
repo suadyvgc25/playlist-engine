@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Track } from "../types/track";
 
 import { searchTracks } from "../services/spotify/search";
-import { getStoredTokens } from "../services/spotify/auth";
+import { logout, getStoredTokens } from "../services/spotify/auth";
 
 import AuthButton from "../components/AuthButton/AuthButton";
 import Header from "../components/Header/Header";
@@ -23,6 +23,11 @@ export default function HomePage() {
   const [results, setResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function handleLogout() {
+    logout();
+    window.location.reload();
+  }
 
   async function onSearch() {
     if (!query.trim()) return;
@@ -69,7 +74,7 @@ export default function HomePage() {
 
   return (
     <div className={styles.appShell}>
-      <Header isLoggedIn={isLoggedIn} />
+      <Header isLoggedIn={isLoggedIn} onLogout={handleLogout}/>
 
       <main className={styles.main}>
         <section className={styles.leftCol} aria-label="Search and results">

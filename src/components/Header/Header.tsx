@@ -3,11 +3,13 @@ import styles from "./Header.module.scss";
 type HeaderProps = {
   isLoggedIn?: boolean;
   userName?: string;
+  onLogout: () => void;
 };
 
 export default function Header({
   isLoggedIn = false,
   userName = "User",
+  onLogout,
 }: HeaderProps) {
   return (
     <header className={styles.header}>
@@ -17,7 +19,7 @@ export default function Header({
         {isLoggedIn ? (
           <>
             <span>Logged in as {userName}</span>
-            <button>Log Out</button>
+            <button type="button" onClick={onLogout}>Log Out</button>
           </>
         ) : (
           <span>Logged out</span>
