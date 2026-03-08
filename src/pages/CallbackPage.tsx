@@ -10,6 +10,10 @@ export default function CallbackPage() {
     (async () => {
       try {
         await finishSpotifyLogin(window.location.search);
+        
+        // clear the URL so code isn't reused
+        window.history.replaceState({}, document.title, "/");
+        
         setStatus("Success! Redirecting...");
         navigate("/", { replace: true });
       } catch (e) {
