@@ -7,7 +7,9 @@ type Props = {
   onNameChange: (value: string) => void;
   onRemove: (trackId: string) => void;
   onClear: () => void;
+  onSave: () => void;
   playlistCount: number;
+  saving: boolean;
 };
 
 export default function Playlist({
@@ -16,7 +18,9 @@ export default function Playlist({
   onNameChange,
   onRemove,
   onClear,
+  onSave,
   playlistCount,
+  saving,
 }: Props) {
   return (
     <div className={styles.playlist}>
@@ -50,8 +54,8 @@ export default function Playlist({
 
       <div className={styles.actions}>
         <button className={styles.clearButton} onClick={onClear}>Clear All</button>
-        <button className={styles.saveButton} disabled={tracks.length === 0}>
-          Save Playlist
+        <button className={styles.saveButton} onClick={onSave} disabled={tracks.length === 0 || saving}>
+          {saving ? "Saving..." : "Save Playlist"}
         </button>
       </div>
     </div>

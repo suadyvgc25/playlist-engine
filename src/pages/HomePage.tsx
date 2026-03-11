@@ -3,6 +3,7 @@ import type { Track } from "../types/track";
 
 import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
+import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
 
 import AuthButton from "../components/AuthButton/AuthButton";
 import Header from "../components/Header/Header";
@@ -18,6 +19,10 @@ export default function HomePage() {
 
   const [playlistName, setPlaylistName] = useState("My Playlist");
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]);
+
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState<string | null>(null);
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Track[]>([]);
@@ -65,6 +70,22 @@ export default function HomePage() {
   function clearPlaylist() {
     setPlaylistTracks([]);
   }
+
+  async function handleSavePlaylist() {
+    try {
+      setSaving(true);
+      setSaveError(null);
+
+      const playlist = await savePlaylistToSpotify(playlistName, playlistTracks);
+      console.log("Open playlist here:", playlist.external_urls?.spotify);
+      setSaveSuccess(`Playlist saved: ${playlist.name}`);
+
+    } catch (e: any) {
+      setSaveError(e?.message ?? "Failed to save playlist");
+    } finally {
+      setSaving(false);
+    }
+ }
 
   const resultsCount = results.length;
   const playlistCount = playlistTracks.length;
@@ -119,13 +140,18 @@ export default function HomePage() {
         <section className={styles.rightCol} aria-label="Playlist builder">
           <h2 className={styles.sectionTitle}>Playlist Builder</h2>
 
+          {saveSuccess && <p style={{ color: "green" }}>{saveSuccess}</p>}
+          {saveError && <p style={{ color: "red" }}>{saveError}</p>}
+
           <Playlist
             name={playlistName}
             tracks={playlistTracks}
             onNameChange={handlePlaylistNameChange}
             onRemove={removeTrack}
             onClear={clearPlaylist}
+            onSave={handleSavePlaylist}
             playlistCount={playlistCount}
+            saving={saving}
           />
         </section>
       </main>
