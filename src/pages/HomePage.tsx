@@ -129,7 +129,6 @@ export default function HomePage() {
 
           {isLoggedIn && (
             <>
-              <p style={{ marginBottom: 12 }}>✅ Logged in to Spotify</p>
 
               <SearchBar
                 query={query}
@@ -140,9 +139,9 @@ export default function HomePage() {
 
               {error && <p style={{ marginTop: 12 }}>❌ {error}</p>}
 
-              {showNoResults && (
+              {/* {showNoResults && (
                 <p style={{ marginTop: 12 }}>No results.</p>
-              )}
+              )} */}
 
               <SearchResults
                  tracks={results}
