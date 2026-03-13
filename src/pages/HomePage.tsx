@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Track } from "../types/track";
+import type { SpotifyCurrentUser } from "../services/spotify/users";
 
+import { getCurrentUserProfile } from "../services/spotify/users";
 import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
@@ -16,6 +18,7 @@ import styles from "../App.module.scss";
 export default function HomePage() {
   const tokens = getStoredTokens();
   const isLoggedIn = !!tokens;
+  const [user, setUser] = useState<SpotifyCurrentUser | null>(null);
 
   const [playlistName, setPlaylistName] = useState("My Playlist");
   const [playlistTracks, setPlaylistTracks] = useState<Track[]>([]);
@@ -29,10 +32,18 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function handleLogout() {
-    logout();
-    window.location.reload();
-  }
+  useEffect(() => {
+    async function loadUser() {
+      if (!tokens) return;
+      try {
+        const profile = await getCurrentUserProfile();
+        setUser(profile);
+      } catch (err) {
+        console.error("Failed to load user", err);
+      }
+    }
+    loadUser();
+  }, []);
 
   async function onSearch() {
     if (!query.trim()) return;
@@ -85,7 +96,12 @@ export default function HomePage() {
     } finally {
       setSaving(false);
     }
- }
+  }
+
+  function handleLogout() {
+    logout();
+    window.location.reload();
+  }
 
   const resultsCount = results.length;
   const playlistCount = playlistTracks.length;
@@ -95,8 +111,11 @@ export default function HomePage() {
 
   return (
     <div className={styles.appShell}>
-      <Header isLoggedIn={isLoggedIn} onLogout={handleLogout}/>
-
+      <Header 
+        isLoggedIn={isLoggedIn} 
+        userName={user?.display_name} 
+        onLogout={handleLogout}
+      />
       <main className={styles.main}>
         <section className={styles.leftCol} aria-label="Search and results">
           <h2 className={styles.sectionTitle}>Browse Music</h2>

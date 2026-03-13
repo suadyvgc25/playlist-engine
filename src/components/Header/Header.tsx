@@ -7,8 +7,8 @@ type HeaderProps = {
 };
 
 export default function Header({
-  isLoggedIn = false,
-  userName = "User",
+  isLoggedIn,
+  userName,
   onLogout,
 }: HeaderProps) {
   return (
@@ -18,7 +18,7 @@ export default function Header({
       <div className={styles.authStatus}>
         {isLoggedIn ? (
           <>
-            <span>Logged in as {userName}</span>
+            <span>Logged in as {userName ?? "Spotify User"}</span>
             <button type="button" onClick={onLogout}>Log Out</button>
           </>
         ) : (
