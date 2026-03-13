@@ -6,10 +6,24 @@
   gap: 14px;
 }
 
+.inputWrapper {
+  position: relative;
+  flex: 1; 
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%); // vertically center
+  color: #999;
+  pointer-events: none; // lets clicks go through to input
+}
+
 .input {
-  flex: 1;
+  width: 100%;
   height: 52px;
-  padding: 0 16px;
+  padding: 0 16px 0 35px;
   border-radius: 14px;
   border: 1px solid rgba(15, 23, 42, 0.10);
   background: #ffffff;
@@ -32,7 +46,7 @@
 
 .button {
   height: 52px;
-  padding: 0 20px;
+  padding: 0 40px;
   border: none;
   border-radius: 14px;
 

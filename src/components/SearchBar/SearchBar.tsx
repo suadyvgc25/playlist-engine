@@ -1,3 +1,4 @@
+import { FaSearch } from "react-icons/fa"; // FontAwesome search icon
 import styles from "./SearchBar.module.scss";
 
 type Props = {
@@ -22,13 +23,16 @@ const handleSubmit = (e: any) => {
 
   return (
     <form className={styles.searchBar} onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Search for songs or artists..."
-        className={styles.input}
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-      />
+      <div className={styles.inputWrapper}>
+        <FaSearch className={styles.searchIcon} />
+        <input
+          type="text"
+          placeholder="Search for songs or artists..."
+          className={styles.input}
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+        />
+      </div>
       <button
         className={styles.button}
         onClick={onSearch}
