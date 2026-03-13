@@ -37,9 +37,14 @@ export default function Playlist({
       <ul className={styles.trackList}>
         {tracks.map((track) => (
           <li key={track.id} className={styles.trackItem}>
-            <div>
-              <strong>{track.name}</strong>
-              <p>{track.artist}</p>
+            <img 
+              src={track.imageUrl} 
+              alt={`${track.name} cover`} 
+              className={styles.albumImage} 
+            />
+            <div className={styles.trackInfo}>
+              <p className={styles.trackName}>{track.name}</p>
+              <p className={styles.artistName}>{track.artist}</p>
             </div>
 
             <button
