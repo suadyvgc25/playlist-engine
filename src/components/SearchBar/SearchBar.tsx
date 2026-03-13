@@ -13,9 +13,15 @@ export default function SearchBar({
   onSearch,
   loading,
 }: Props) { 
+  
+const handleSubmit = (e: any) => {
+  e.preventDefault();
+  if (!query.trim()) return;
+  onSearch();
+};
 
   return (
-    <div className={styles.searchBar}>
+    <form className={styles.searchBar} onSubmit={handleSubmit}>
       <input
         type="text"
         placeholder="Search for songs or artists..."
@@ -30,6 +36,6 @@ export default function SearchBar({
       >
         {loading ? "Searching..." : "Search"}
       </button>
-    </div>
+    </form>
   );
 }
