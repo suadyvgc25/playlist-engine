@@ -1,5 +1,13 @@
 /* SearchResults.module.scss */
 
+.headerRow {
+  display: flex;
+  align-items: center;      
+  justify-content: space-between; 
+  gap: 1rem;    
+  margin: 8px 0 0;        
+}
+
 .results {
   display: flex;
   flex-direction: column;
@@ -7,7 +15,7 @@
 }
 
 .results h2 {
-  margin: 8px 0 0;
+  // margin: 8px 0 0;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.01em;

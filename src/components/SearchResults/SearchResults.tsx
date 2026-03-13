@@ -19,7 +19,9 @@ export default function SearchResults({
     <div className={styles.results}>
       <div className={styles.headerRow}>
         <h2>Search Results</h2>
-        <span className={styles.count}>({resultsCount})</span>
+        <span className={styles.count}>
+          {resultsCount} {resultsCount === 1 ? "song" : "songs"} found
+        </span>
       </div>
       <ul className={styles.trackList}>
         {tracks.map((track) => (
@@ -28,7 +30,7 @@ export default function SearchResults({
               <strong>{track.name}</strong>
               <p>{track.artist}</p>
             </div>
-            <button className={styles.addButton} onClick={() => onAdd(track)}>Add</button>
+            <button className={styles.addButton} onClick={() => onAdd(track)}>+ Add</button>
           </li>
         ))}
       </ul>
