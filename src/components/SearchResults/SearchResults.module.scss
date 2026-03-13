@@ -15,11 +15,24 @@
 }
 
 .results h2 {
-  // margin: 8px 0 0;
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.01em;
   color: #0f172a;
+}
+
+.trackItem {
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+  padding: 10px 0;
+}
+
+.albumImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
 }
 
 .trackList {
@@ -31,20 +44,22 @@
   gap: 14px;
 }
 
+.trackInfo {
+  display: flex;
+  flex-direction: column;
+}
+
 .trackItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-
   padding: 14px 14px;
   border-radius: 16px;
   border: 1px solid rgba(15, 23, 42, 0.06);
   background: rgba(255, 255, 255, 0.90);
-
   box-shadow:
     0 18px 40px rgba(15, 23, 42, 0.06);
-
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -74,15 +89,13 @@
   min-width: 92px;
   padding: 0 14px;
   border-radius: 12px;
-
   border: 1px solid rgba(79, 70, 229, 0.25);
   background: rgba(99, 102, 241, 0.08);
   color: #3b82f6;
-
   font-weight: 800;
   cursor: pointer;
-
   transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  margin-left: auto;
 }
 
 .addButton:hover {
