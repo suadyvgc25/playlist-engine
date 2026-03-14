@@ -31,7 +31,9 @@ export default function Playlist({
           onChange={(e) => onNameChange(e.target.value)}
           className={styles.titleInput}
         />
-        <span className={styles.count}>({playlistCount})</span>
+        <div className={styles.count}>
+          {playlistCount} {playlistCount === 1 ? "song" : "songs"}
+        </div>
       </div>
 
       <ul className={styles.trackList}>

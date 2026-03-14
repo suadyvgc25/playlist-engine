@@ -6,6 +6,14 @@
   gap: 16px;
 }
 
+.headerRow {
+  display: flex;
+  align-items: center;      
+  justify-content: space-between; 
+  gap: 1rem;    
+  margin: 8px 0 0;        
+}
+
 .titleInput {
   height: 48px;
   padding: 0 14px;
@@ -24,7 +32,6 @@
     0 0 0 4px rgba(99, 102, 241, 0.15),
     0 10px 24px rgba(15, 23, 42, 0.06);
 }
-
 
 .trackItem {
   display: flex;
