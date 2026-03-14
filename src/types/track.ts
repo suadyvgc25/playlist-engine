@@ -5,4 +5,5 @@ export type Track = {
   album: string;
   imageUrl?: string;
   uri: string;
+  duration: number;
 };

@@ -1,13 +1,5 @@
 /* SearchResults.module.scss */
 
-.headerRow {
-  display: flex;
-  align-items: center;      
-  justify-content: space-between; 
-  gap: 1rem;    
-  margin: 8px 0 0;        
-}
-
 .results {
   display: flex;
   flex-direction: column;
@@ -21,18 +13,12 @@
   color: #0f172a;
 }
 
-.trackItem {
+.headerRow {
   display: flex;
-  align-items: center;
-  gap: 12px; 
-  padding: 10px 0;
-}
-
-.albumImage {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
-  object-fit: cover;
+  align-items: center;      
+  justify-content: space-between; 
+  gap: 1rem;    
+  margin: 8px 0 0;        
 }
 
 .trackList {
@@ -42,11 +28,6 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.trackInfo {
-  display: flex;
-  flex-direction: column;
 }
 
 .trackItem {
@@ -80,6 +61,34 @@
   font-size: 14px;
   font-weight: 600;
   color: rgba(15, 23, 42, 0.55);
+}
+
+.albumImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.trackInfo {
+  display: flex;
+  flex-direction: column;
+  flex:1;
+}
+
+.trackActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trackDuration {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.55);
+  min-width: 40px;
+  text-align: right;
 }
 
 .addButton {

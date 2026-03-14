@@ -8,5 +8,6 @@ export function mapSpotifyTrackToTrack(item: any): Track {
     album: item.album?.name ?? "Unknown",
     imageUrl: item.album?.images?.[0]?.url ?? "", 
     uri: item.uri,
+    duration: item.duration_ms,
   };
 }

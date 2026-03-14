@@ -1,5 +1,6 @@
 import styles from "./SearchResults.module.scss";
 import type { Track } from "../../types/track";
+import { formatDuration } from "../../utils/formatDuration";
 
 type Props = {
   tracks: Track[];
@@ -19,9 +20,9 @@ export default function SearchResults({
     <div className={styles.results}>
       <div className={styles.headerRow}>
         <h2>Search Results</h2>
-        <span className={styles.count}>
+        <div className={styles.count}>
           {resultsCount} {resultsCount === 1 ? "song" : "songs"} found
-        </span>
+        </div>
       </div>
       <ul className={styles.trackList}>
         {tracks.map((track) => (
@@ -35,7 +36,15 @@ export default function SearchResults({
               <p className={styles.trackName}>{track.name}</p>
               <p className={styles.artistName}>{track.artist}</p>
             </div>
-            <button className={styles.addButton} onClick={() => onAdd(track)}>+ Add</button>
+            <div className={styles.trackActions}>
+              <p className={styles.trackDuration}>{formatDuration(track.duration)}</p>
+              <button 
+                className={styles.addButton} 
+                onClick={() => onAdd(track)}
+              >
+                + Add
+              </button>
+            </div>
           </li>
         ))}
       </ul>
