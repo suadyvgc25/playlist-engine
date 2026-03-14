@@ -1,6 +1,7 @@
 import styles from "./Playlist.module.scss";
 import type { Track } from "../../types/track";
 import { formatDuration } from "../../utils/formatDuration";
+import { formatPlaylistDuration } from "../../utils/formatPlaylistDuration";
 
 type Props = {
   name: string;
@@ -23,6 +24,13 @@ export default function Playlist({
   playlistCount,
   saving,
 }: Props) {
+
+  const totalDuration = tracks.reduce(
+    (sum, track) => sum + track.duration, 0
+  );
+
+  const playlistDuration = formatPlaylistDuration(totalDuration);
+
   return (
     <div className={styles.playlist}>
       <div className={styles.headerRow}>
@@ -33,7 +41,7 @@ export default function Playlist({
           className={styles.titleInput}
         />
         <div className={styles.count}>
-          {playlistCount} {playlistCount === 1 ? "song" : "songs"}
+          {playlistCount} {playlistCount === 1 ? "song" : "songs"} • {playlistDuration}
         </div>
       </div>
 
