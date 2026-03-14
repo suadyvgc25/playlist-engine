@@ -59,6 +59,22 @@
 .trackInfo {
   display: flex;
   flex-direction: column;
+  flex:1;
+}
+
+.trackActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trackDuration {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.55);
+  min-width: 40px;
+  text-align: right;
 }
 
 .trackItem {

@@ -1,5 +1,6 @@
 import styles from "./Playlist.module.scss";
 import type { Track } from "../../types/track";
+import { formatDuration } from "../../utils/formatDuration";
 
 type Props = {
   name: string;
@@ -48,13 +49,16 @@ export default function Playlist({
               <p className={styles.trackName}>{track.name}</p>
               <p className={styles.artistName}>{track.artist}</p>
             </div>
-
-            <button
-              className={styles.removeButton}
-              onClick={() => onRemove(track.id)}
-            >
-              Remove
-            </button>
+            <div className={styles.trackActions}>
+              <p className={styles.trackDuration}>{formatDuration(track.duration)}</p>
+              <button
+                className={styles.removeButton}
+                onClick={() => onRemove(track.id)}
+              >
+                Remove
+              </button>
+            </div>
+            
           </li>
         ))}
       </ul>
