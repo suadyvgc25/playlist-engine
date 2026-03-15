@@ -7,6 +7,7 @@ import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
 
+import LoginHero from "../components/LoginHero/LoginHero";
 import AuthButton from "../components/AuthButton/AuthButton";
 import Header from "../components/Header/Header";
 import SearchBar from "../components/SearchBar/SearchBar";
@@ -18,6 +19,11 @@ import styles from "../App.module.scss";
 export default function HomePage() {
   const tokens = getStoredTokens();
   const isLoggedIn = !!tokens;
+
+  if (!isLoggedIn) {
+    return <LoginHero />;
+  }
+
   const [user, setUser] = useState<SpotifyCurrentUser | null>(null);
 
   const [playlistName, setPlaylistName] = useState("My Playlist");
@@ -120,13 +126,6 @@ export default function HomePage() {
         <section className={styles.leftCol} aria-label="Search and results">
           <h2 className={styles.sectionTitle}>Browse Music</h2>
 
-          {!isLoggedIn && (
-            <div style={{ marginBottom: 20 }}>
-              <AuthButton />
-              <p style={{ marginTop: 8 }}>❌ Not logged in</p>
-            </div>
-          )}
-
           {isLoggedIn && (
             <>
 
@@ -138,10 +137,6 @@ export default function HomePage() {
               />
 
               {error && <p style={{ marginTop: 12 }}>❌ {error}</p>}
-
-              {/* {showNoResults && (
-                <p style={{ marginTop: 12 }}>No results.</p>
-              )} */}
 
               <SearchResults
                  tracks={results}

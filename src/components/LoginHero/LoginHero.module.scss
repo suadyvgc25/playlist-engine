@@ -1,0 +1,86 @@
+.hero {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    180deg,
+    rgba(20,20,40,0.35) 0%,
+    rgba(10,10,25,0.65) 100%
+  );
+
+  z-index: 2;
+  backdrop-filter: blur(6px);
+}
+
+.content {
+  position: relative;
+  text-align: center;
+  color: white;
+  max-width: 520px;
+  z-index: 3;
+}
+
+.content h1 {
+  font-size: 56px;
+  margin-bottom: 8px;
+}
+
+.content h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.content p {
+  opacity: 0.8;
+  margin-bottom: 30px;
+}
+
+.spotifyButton {
+  background: linear-gradient(
+    135deg,
+    #1db954,
+    #1ed760
+  );
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+
+  color: white;
+
+  cursor: pointer;
+
+  transition: all .2s ease;
+
+  box-shadow: 0 10px 30px rgba(29,185,84,0.4);
+}
+
+.spotifyButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(29,185,84,0.6);
+}
+
+.features {
+  margin-top: 28px;
+  list-style: none;
+  padding: 0;
+
+  li {
+    margin: 8px 0;
+    opacity: 0.9;
+  }
+}
