@@ -22,11 +22,58 @@
   backdrop-filter: blur(6px);
 }
 
+.loginCard {
+  position: relative;
+  z-index: 3;
+
+  width: 1000px;
+  max-width: 90%;
+
+  padding: 60px 70px;
+
+  border-radius: 28px;
+
+  /* glass gradient background */
+  background: linear-gradient(
+    180deg,
+    rgba(60, 60, 120, 0.35),
+    rgba(30, 30, 60, 0.35)
+  );
+
+  /* frosted glass blur */
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  /* border glow */
+  border: 1px solid rgba(255,255,255,0.15);
+
+  /* soft shadow */
+ box-shadow:
+  0 40px 100px rgba(0,0,0,0.45),
+  0 0 80px rgba(120,120,255,0.25),
+  inset 0 0 0 1px rgba(255,255,255,0.05);
+
+  text-align: center;
+}
+
+.loginCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  pointer-events: none;
+}
+
 .content {
   position: relative;
   text-align: center;
   color: white;
   max-width: 520px;
+  margin: 0 auto;
   z-index: 3;
 }
 
@@ -46,32 +93,60 @@
   margin-bottom: 30px;
 }
 
-.spotifyButton {
-  background: linear-gradient(
-    135deg,
-    #1db954,
-    #1ed760
-  );
+.loginButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 
-  border: none;
-  border-radius: 999px;
+  margin-top: 32px;
 
-  padding: 14px 32px;
-  font-size: 16px;
+  padding: 16px 38px;
+
+  font-size: 17px;
   font-weight: 600;
 
   color: white;
 
+  border: none;
+  border-radius: 999px;
+
   cursor: pointer;
 
-  transition: all .2s ease;
+  /* Softer Spotify gradient */
+  background: linear-gradient(
+    135deg,
+    #316343 0%,
+    #1ed760 100%
+  );
 
-  box-shadow: 0 10px 30px rgba(29,185,84,0.4);
+  /* softer glow */
+  box-shadow: 0 8px 22px rgba(29,185,84,0.28);
+
+  transition: all 0.25s ease;
 }
 
-.spotifyButton:hover {
+.loginButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(29,185,84,0.6);
+
+  background: linear-gradient(
+    135deg,
+    #1ed760 0%,
+    #28e06f 100%
+  );
+
+  box-shadow: 0 12px 32px rgba(29,185,84,0.35);
+}
+
+.loginButton:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(29,185,84,0.25);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
 }
 
 .features {

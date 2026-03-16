@@ -1,27 +1,29 @@
 .grid {
   position: absolute;
-  inset: -200px;
+  inset: -250px;
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, 220px);
-  grid-auto-rows: 220px;
+  grid-template-columns: repeat(auto-fill, 190px);
+  grid-auto-rows: 190px;
 
   gap: 20px;
   padding: 80px;
+
   z-index: 1;
   overflow: hidden;
-  transform: rotate(-12deg) scale(1.2);
-  transform-origin: center;
+
   filter: blur(4px);
+
   animation: drift 60s linear infinite;
 }
 
 @keyframes drift {
   from {
-    transform: rotate(-12deg) scale(1.2) translateY(0);
+    transform: perspective(1400px) rotateX(14deg) rotateZ(6deg) scale(1.25) translate(0, 0);
   }
+
   to {
-    transform: rotate(-12deg) scale(1.2) translateY(-300px);
+    transform: perspective(1400px) rotateX(14deg) rotateZ(6deg) scale(1.25) translate(-120px, -300px);
   }
 }
 

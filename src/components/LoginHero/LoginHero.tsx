@@ -9,33 +9,34 @@ export default function LoginHero() {
       <AlbumMosaic />
 
       <div className={styles.overlay} />
+      <div className={styles.loginCard}>
+         <div className={styles.content}>
+            <h1 className={styles.title}>Playlist Engine</h1>
 
-      <div className={styles.content}>
-        <h1 className={styles.title}>Playlist Engine</h1>
+            <h2 className={styles.subtitle}>
+            Create Playlists That Flow
+            </h2>
 
-        <h2 className={styles.subtitle}>
-          Create Playlists That Flow
-        </h2>
+            <p className={styles.description}>
+            Search millions of tracks and build your perfect mix in seconds.
+            </p>
 
-        <p className={styles.description}>
-          Search millions of tracks and build your perfect mix in seconds.
-        </p>
+            <button className={styles.loginButton} onClick={startSpotifyLogin}>
+            <img
+                src="/spotify-white.svg"
+                alt="Spotify"
+                className={styles.icon}
+            />
+            Log in with Spotify
+            </button>
 
-        <button className={styles.loginButton} onClick={startSpotifyLogin}>
-          <img
-            src="/spotify-icon.svg"
-            alt="Spotify"
-            className={styles.icon}
-          />
-          Log in with Spotify
-        </button>
-
-        <ul className={styles.features}>
-          <li>✓ Album artwork preview</li>
-          <li>✓ Live playlist duration</li>
-          <li>✓ Save directly to Spotify</li>
-        </ul>
-      </div>
+            <ul className={styles.features}>
+            <li>✓ Album artwork preview</li>
+            <li>✓ Live playlist duration</li>
+            <li>✓ Save directly to Spotify</li>
+            </ul>
+         </div>
+       </div>
     </section>
   );
 }
