@@ -31,9 +31,20 @@ export default function LoginHero() {
             </button>
 
             <ul className={styles.features}>
-            <li>✓ Album artwork preview</li>
-            <li>✓ Live playlist duration</li>
-            <li>✓ Save directly to Spotify</li>
+              <li>
+                <span className={styles.check}>✓</span>
+                <span>Album artwork preview</span>
+              </li>
+
+              <li>
+                <span className={styles.check}>✓</span>
+                <span>Live playlist duration</span>
+              </li>
+
+              <li>
+                <span className={styles.check}>✓</span>
+                <span>Save directly to Spotify</span>
+              </li>
             </ul>
          </div>
        </div>
