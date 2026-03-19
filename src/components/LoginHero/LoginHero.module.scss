@@ -11,13 +11,11 @@
 .overlay {
   position: absolute;
   inset: 0;
-
   background: linear-gradient(
     180deg,
     rgba(20,20,40,0.35) 0%,
     rgba(10,10,25,0.65) 100%
   );
-
   z-index: 2;
   backdrop-filter: blur(6px);
 }
@@ -25,34 +23,26 @@
 .loginCard {
   position: relative;
   z-index: 3;
-
   width: 1000px;
   max-width: 90%;
-
   padding: 60px 70px;
-
   border-radius: 28px;
-
   /* glass gradient background */
   background: linear-gradient(
     180deg,
     rgba(60, 60, 120, 0.35),
     rgba(30, 30, 60, 0.35)
   );
-
   /* frosted glass blur */
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(18px);
-
   /* border glow */
   border: 1px solid rgba(255,255,255,0.15);
-
   /* soft shadow */
  box-shadow:
   0 40px 100px rgba(0,0,0,0.45),
   0 0 80px rgba(120,120,255,0.25),
   inset 0 0 0 1px rgba(255,255,255,0.05);
-
   text-align: center;
 }
 
@@ -60,11 +50,8 @@
   content: "";
   position: absolute;
   inset: 0;
-
   border-radius: inherit;
-
   border: 1px solid rgba(255,255,255,0.12);
-
   pointer-events: none;
 }
 
@@ -98,50 +85,29 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-
   margin-top: 32px;
-
   padding: 16px 38px;
-
   font-size: 17px;
   font-weight: 600;
-
   color: white;
-
   border: none;
   border-radius: 10px;
-
   cursor: pointer;
-
-  /* Softer Spotify gradient */
-  // background: linear-gradient(
-  //   135deg,
-  //   #316343 0%,
-  //   #1ed760 100%
-  // );
-  background-color: #1abc54;
-
+  background-color: #130f0f;
   /* softer glow */
-  box-shadow: 0 8px 22px rgba(29,185,84,0.28);
-
+  box-shadow: 0 8px 22px rgba(213, 135, 235, 0.35);
   transition: all 0.25s ease;
 }
 
 .loginButton:hover {
   transform: translateY(-2px);
-
-  background: linear-gradient(
-    135deg,
-    #1ed760 0%,
-    #28e06f 100%
-  );
-
-  box-shadow: 0 12px 32px rgba(29,185,84,0.35);
+  background-color: #6f2e77;
+  box-shadow: 0 12px 32px rgba(213, 135, 235, 0.35);
 }
 
 .loginButton:active {
   transform: translateY(0);
-  box-shadow: 0 6px 16px rgba(29,185,84,0.25);
+  box-shadow: 0 6px 16px rgba(213, 135, 235, 0.35);
 }
 
 .icon {
@@ -154,11 +120,9 @@
   list-style: none;
   padding: 0;
   margin-top: 26px;
-
   display: flex;
   flex-direction: column;
   gap: 10px;
-
   font-size: 15px;
   color: rgba(255,255,255,0.75);
   align-items: center;
@@ -175,12 +139,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   width: 24px;
   margin-right: 8px;
-
   font-size: 16px;
   font-weight: 600;
-
-  color: #22c55e;
+  color: #ffffff;
 }

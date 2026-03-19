@@ -10,20 +10,19 @@
   display: flex;
   align-items: center;      
   justify-content: space-between; 
-  gap: 1rem;    
-  margin: 8px 0 0;        
+  gap: 1rem;        
 }
 
 .titleInput {
+  flex: 1;
   height: 48px;
   padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  background: #ffffff;
+  border-radius: 14px;
+  border: none;
+  padding: 0 35px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
   font-size: 16px;
-  font-weight: 700;
-  outline: none;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
 }
 
 .titleInput:focus {
@@ -33,33 +32,80 @@
     0 10px 24px rgba(15, 23, 42, 0.06);
 }
 
-.trackItem {
-  display: flex;
-  align-items: center;
-  gap: 12px; 
-  padding: 10px 0;
-}
-
-.albumImage {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
-  object-fit: cover;
+.count {
+  white-space: nowrap;
+  text-align: right;
+  font-size: 16px;
+  color: white;
+  opacity: 0.8;
+  font-weight: 500;
 }
 
 .trackList {
   list-style: none;
   padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+}
+
+.trackItem {
+  display: flex;
+  align-items: center;
+  gap: 12px; 
+  padding: 10px 14px;
+  border-radius: 18px;
+  background-color: #271925;
+  background-image: linear-gradient(
+    120deg,
+    rgba(88, 63, 135, 0.35) 0%,
+    rgba(67, 56, 202, 0.25) 40%,
+    rgba(30, 41, 99, 0.35) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.trackItem:hover {
+  background-color: #14172e;
+  background-image: linear-gradient(
+    120deg,
+    rgba(109, 70, 180, 0.4),
+    rgba(79, 70, 229, 0.3)
+  );
+  transform: translateY(-1px);
+}
+
+.albumImage {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
 .trackInfo {
   display: flex;
   flex-direction: column;
   flex:1;
+  justify-content: center;
+}
+
+.trackName {
+  margin: 0;               
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;        
+}
+
+.artistName {
+  margin: 0;                
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
 }
 
 .trackActions {
@@ -69,52 +115,33 @@
 }
 
 .trackDuration {
-  margin-left: auto;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(15, 23, 42, 0.55);
+  color: rgba(255, 255, 255, 0.7);
   min-width: 40px;
   text-align: right;
 }
 
-.trackItem {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.90);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.trackItem strong {
-  display: block;
-  font-size: 18px;
-  font-weight: 850;
-  letter-spacing: -0.01em;
-  color: #0f172a;
-}
-
-.trackItem p {
-  margin: 4px 0 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(15, 23, 42, 0.55);
-}
-
-/* Your TSX uses a Remove button — we’ll style it like the small red icon action */
 .removeButton {
   height: 36px;
-  padding: 0 12px;
+  padding: 6px 14px;
+  font-size: 13px;
   border-radius: 12px;
-  border: 1px solid rgba(239, 68, 68, 0.22);
-  background: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
-  font-weight: 800;
+  /* Soft purple border */
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  /* Glass background */
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.08)
+  );
+   /* Inner + outer glow */
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(139, 92, 246, 0.25);
+  color: white;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
   margin-left: auto;
 }
 
@@ -136,31 +163,30 @@
   margin-top: 12px;
 }
 
-/* Save Button */
 .saveButton {
-  flex: 1;              /* ✅ this is the key */
+  flex: 1;            
   height: 58px;
   padding: 0 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   border: none;
   border-radius: 20px;
-  background: linear-gradient(90deg, #22c55e 0%, #06b6d4 55%, #2563eb 100%);
-  color: #ffffff;
   font-size: 18px;
   font-weight: 950;
   letter-spacing: -0.02em;
   cursor: pointer;
-  box-shadow:
-    0 26px 60px rgba(34, 197, 94, 0.18),
-    0 16px 30px rgba(37, 99, 235, 0.14);
+  background-color: #130f0f;
+  color:white;
   transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
 }
 
 .saveButton:hover {
   transform: translateY(-1px);
   filter: brightness(1.02);
-  box-shadow:
-    0 30px 70px rgba(34, 197, 94, 0.20),
-    0 18px 34px rgba(37, 99, 235, 0.16);
+  background-color: #6f2e77;
+  box-shadow: 0 12px 32px rgba(213, 135, 235, 0.35);
 }
 
 .saveButton:active {
@@ -184,29 +210,44 @@
   }
 }
 
-/* Clear button*/
 .clearButton {
   height: 58px;
   padding: 0 30px;
   min-width: 180px; 
   border-radius: 18px;
-  border: 2px solid rgba(15, 23, 42, 0.12);
-  background: rgba(15, 23, 42, 0.03);
-  color: #0f172a;
+  color: white;
   font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.01em;
   cursor: pointer;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  /* Soft purple border */
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  /* Glass background */
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.08)
+  );
+   /* Inner + outer glow */
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(139, 92, 246, 0.25);
 }
 
 .clearButton:hover {
   transform: translateY(-1px);
-  background: rgba(15, 23, 42, 0.05);
-  box-shadow: 0 22px 50px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
 }
 
 .clearButton:active {
   transform: translateY(0);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
 }

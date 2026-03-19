@@ -3,22 +3,30 @@
 .results {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.results h2 {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #0f172a;
+  gap: 16px;
 }
 
 .headerRow {
   display: flex;
   align-items: center;      
   justify-content: space-between; 
-  gap: 1rem;    
-  margin: 8px 0 0;        
+ 
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+  }    
+
+}
+
+.count {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #c4b5fd;
+  background: rgba(38 36 71);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  backdrop-filter: blur(10px);
 }
 
 .trackList {
@@ -27,46 +35,59 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .trackItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.90);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background-color: #271925;
+  background-image: linear-gradient(
+    120deg,
+    rgba(88, 63, 135, 0.35) 0%,
+    rgba(67, 56, 202, 0.25) 40%,
+    rgba(30, 41, 99, 0.35) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.trackItem::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(180, 140, 255, 0.15),
+    transparent
+  );
+  pointer-events: none;
 }
 
 .trackItem:hover {
+  background-color: #14172e;
+  background-image: linear-gradient(
+    120deg,
+    rgba(109, 70, 180, 0.4),
+    rgba(79, 70, 229, 0.3)
+  );
   transform: translateY(-1px);
-  box-shadow:
-    0 24px 50px rgba(15, 23, 42, 0.08);
-}
-
-.trackItem strong {
-  display: block;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #0f172a;
-}
-
-.trackItem p {
-  margin: 4px 0 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(15, 23, 42, 0.55);
 }
 
 .albumImage {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   object-fit: cover;
 }
 
@@ -74,6 +95,19 @@
   display: flex;
   flex-direction: column;
   flex:1;
+}
+
+.trackName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.artistName {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .trackActions {
@@ -86,7 +120,7 @@
   margin-left: auto;
   font-size: 12px;
   font-weight: 500;
-  color: rgba(15, 23, 42, 0.55);
+  color: rgba(255, 255, 255, 0.7);
   min-width: 40px;
   text-align: right;
 }
@@ -94,21 +128,31 @@
 .addButton {
   height: 38px;
   min-width: 92px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(79, 70, 229, 0.25);
-  background: rgba(99, 102, 241, 0.08);
-  color: #3b82f6;
-  font-weight: 800;
+  padding: 6px 14px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
-  margin-left: auto;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  /* Soft purple border */
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  /* Glass background */
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.08)
+  );
+   /* Inner + outer glow */
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(139, 92, 246, 0.25);
 }
 
 .addButton:hover {
   transform: translateY(-1px);
-  background: rgba(99, 102, 241, 0.12);
-  border-color: rgba(79, 70, 229, 0.35);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
 }
 
 .addButton:active {

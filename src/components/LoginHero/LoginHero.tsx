@@ -5,7 +5,7 @@ import AlbumMosaic from "../AlbumMosaic/AlbumMosaic";
 export default function LoginHero() {
   return (
     <section className={styles.hero}>
-      
+
       <AlbumMosaic />
 
       <div className={styles.overlay} />

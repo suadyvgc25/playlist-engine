@@ -74,6 +74,11 @@ export default function Playlist({
       <div className={styles.actions}>
         <button className={styles.clearButton} onClick={onClear}>Clear All</button>
         <button className={styles.saveButton} onClick={onSave} disabled={tracks.length === 0 || saving}>
+          <img
+                src="/spotify-white.svg"
+                alt="Spotify"
+                className={styles.icon}
+          />
           {saving ? "Saving..." : "Save Playlist"}
         </button>
       </div>
