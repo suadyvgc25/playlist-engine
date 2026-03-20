@@ -61,3 +61,49 @@
     border-radius: 18px;
   }
 } 
+
+.dragOverlayCard {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 520px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: grab;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background-color: #271925;
+  background-image: linear-gradient(
+    120deg,
+    rgba(88, 63, 135, 0.35) 0%,
+    rgba(67, 56, 202, 0.25) 40%,
+    rgba(30, 41, 99, 0.35) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.overlayImage {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+.overlayTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.overlayArtist {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}

@@ -7,6 +7,9 @@ import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
 
+import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
+import { closestCenter } from "@dnd-kit/core";
+
 import LoginHero from "../components/LoginHero/LoginHero";
 import AuthButton from "../components/AuthButton/AuthButton";
 import Header from "../components/Header/Header";
@@ -37,6 +40,8 @@ export default function HomePage() {
   const [results, setResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [activeTrack, setActiveTrack] = useState<Track | null>(null);
 
   useEffect(() => {
     async function loadUser() {
@@ -115,59 +120,89 @@ export default function HomePage() {
   const showNoResults =
     !loading && !error && results.length === 0 && query.trim() !== "";
 
+  function handleDragStart(event: any) {
+    setActiveTrack(event.active.data.current);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    // If dropped in playlist
+    if (over?.id === "playlist-dropzone") {
+      const track = active.data.current as Track;
+      addTrack(track);
+    }
+    setActiveTrack(null);
+  }
+
   return (
-    <div className={styles.appShell}>
-      <Header 
-        isLoggedIn={isLoggedIn} 
-        userName={user?.display_name} 
-        onLogout={handleLogout}
-      />
-      <main className={styles.main}>
-        <section className={styles.leftCol} aria-label="Search and results">
-          <h2 className={styles.sectionTitle}>Browse Music</h2>
+    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className={styles.appShell}>
+        <Header 
+          isLoggedIn={isLoggedIn} 
+          userName={user?.display_name} 
+          onLogout={handleLogout}
+        />
+        <main className={styles.main}>
+          <section className={styles.leftCol} aria-label="Search and results">
+            <h2 className={styles.sectionTitle}>Browse Music</h2>
 
-          {isLoggedIn && (
-            <>
+            {isLoggedIn && (
+              <>
 
-              <SearchBar
-                query={query}
-                onQueryChange={setQuery}
-                onSearch={onSearch}
-                loading={loading}
-              />
+                <SearchBar
+                  query={query}
+                  onQueryChange={setQuery}
+                  onSearch={onSearch}
+                  loading={loading}
+                />
 
-              {error && <p style={{ marginTop: 12 }}>❌ {error}</p>}
+                {error && <p style={{ marginTop: 12 }}>❌ {error}</p>}
 
-              <SearchResults
-                 tracks={results}
-                 onAdd={addTrack}
-                 resultsCount={resultsCount}
-                 loading={loading}
-                 error={error}
-                 query={query}
-              />
-            </>
-          )}
-        </section>
+                <SearchResults
+                  tracks={results}
+                  onAdd={addTrack}
+                  resultsCount={resultsCount}
+                  loading={loading}
+                  error={error}
+                  query={query}
+                />
+              </>
+            )}
+          </section>
 
-        <section className={styles.rightCol} aria-label="Playlist builder">
-          <h2 className={styles.sectionTitle}>Playlist Builder</h2>
+          <section className={styles.rightCol} aria-label="Playlist builder">
+            <h2 className={styles.sectionTitle}>Playlist Builder</h2>
 
-          {saveSuccess && <p style={{ color: "green" }}>{saveSuccess}</p>}
-          {saveError && <p style={{ color: "red" }}>{saveError}</p>}
+            {saveSuccess && <p style={{ color: "green" }}>{saveSuccess}</p>}
+            {saveError && <p style={{ color: "red" }}>{saveError}</p>}
 
-          <Playlist
-            name={playlistName}
-            tracks={playlistTracks}
-            onNameChange={handlePlaylistNameChange}
-            onRemove={removeTrack}
-            onClear={clearPlaylist}
-            onSave={handleSavePlaylist}
-            playlistCount={playlistCount}
-            saving={saving}
-          />
-        </section>
-      </main>
-    </div>
+            <Playlist
+              name={playlistName}
+              tracks={playlistTracks}
+              onNameChange={handlePlaylistNameChange}
+              onRemove={removeTrack}
+              onClear={clearPlaylist}
+              onSave={handleSavePlaylist}
+              playlistCount={playlistCount}
+              saving={saving}
+            />
+          </section>
+        </main>
+      </div>
+
+      <DragOverlay>
+        {activeTrack ? (
+          <div className={styles.dragOverlayCard}>
+            <img src={activeTrack.imageUrl} className={styles.overlayImage} />
+            <div>
+              <p className={styles.overlayTitle}>{activeTrack.name}</p>
+              <p className={styles.overlayArtist}>{activeTrack.artist}</p>
+            </div>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
+
