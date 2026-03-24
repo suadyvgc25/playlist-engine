@@ -1,8 +1,9 @@
 import styles from "./Playlist.module.scss";
 import type { Track } from "../../types/track";
-import { formatDuration } from "../../utils/formatDuration";
 import { formatPlaylistDuration } from "../../utils/formatPlaylistDuration";
 import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import SortableTrackItem from "./SortableTrackItem";
 
 type Props = {
   name: string;
@@ -26,7 +27,7 @@ export default function Playlist({
   saving,
 }: Props) {
 
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef:setDroppableRef } = useDroppable({
     id: "playlist-dropzone",
   });
   const totalDuration = tracks.reduce(
@@ -37,8 +38,9 @@ export default function Playlist({
 
   return (
     <div
-        ref={setNodeRef}
-        className={styles.playlistWrapper}>
+        ref={setDroppableRef}
+        className={styles.playlistWrapper}
+    >
       <div className={styles.playlist}>
         <div className={styles.headerRow}>
           <input
@@ -52,31 +54,20 @@ export default function Playlist({
           </div>
         </div>
 
-        <ul className={styles.trackList}>
-          {tracks.map((track) => (
-            <li key={track.id} className={styles.trackItem}>
-              <img 
-                src={track.imageUrl} 
-                alt={`${track.name} cover`} 
-                className={styles.albumImage} 
+        <SortableContext
+          items={tracks.map((t) => `playlist-${t.id}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          <ul className={styles.trackList}>
+            {tracks.map((track) => (
+              <SortableTrackItem
+                key={`playlist-${track.id}`}
+                track={track}
+                onRemove={onRemove}
               />
-              <div className={styles.trackInfo}>
-                <p className={styles.trackName}>{track.name}</p>
-                <p className={styles.artistName}>{track.artist}</p>
-              </div>
-              <div className={styles.trackActions}>
-                <p className={styles.trackDuration}>{formatDuration(track.duration)}</p>
-                <button
-                  className={styles.removeButton}
-                  onClick={() => onRemove(track.id)}
-                >
-                  Remove
-                </button>
-              </div>
-              
-            </li>
-          ))}
-        </ul>
+            ))}
+          </ul>
+        </SortableContext>
 
         <div className={styles.actions}>
           <button className={styles.clearButton} onClick={onClear}>Clear All</button>
@@ -89,6 +80,7 @@ export default function Playlist({
             {saving ? "Saving..." : "Save Playlist"}
           </button>
         </div>
+        
       </div>
     </div>
   );

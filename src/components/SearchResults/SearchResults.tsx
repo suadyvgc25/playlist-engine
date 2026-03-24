@@ -28,7 +28,7 @@ export default function SearchResults({
       <ul className={styles.trackList}>
         {tracks.map((track) => {
           const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-            id: track.id,
+            id: `search-${track.id}`,
             data: track,
           });
 
@@ -37,12 +37,17 @@ export default function SearchResults({
               key={track.id}
               ref={setNodeRef}
               {...attributes}
+              {...listeners} 
               className={styles.trackItem}
               style={{
                 opacity: isDragging ? 0.3 : 1,
               }}
             >
-            <div {...listeners} className={styles.dragHandle}>
+            <div 
+              
+              className={styles.dragHandle}
+              onClick={(e) => e.stopPropagation()}
+            >
               <img 
                 src={track.imageUrl} 
                 alt={`${track.name} cover`} 
@@ -57,7 +62,11 @@ export default function SearchResults({
                 <p className={styles.trackDuration}>{formatDuration(track.duration)}</p>
                 <button 
                   className={styles.addButton} 
-                  onClick={() => onAdd(track)}
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    onAdd(track);
+                  }}
+                  onPointerDown={(e) => e.stopPropagation()} 
                 >
                   + Add
                 </button>

@@ -7,8 +7,10 @@ import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
 
-import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
-import { closestCenter } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverlay, closestCorners } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
+import { formatDuration } from "../utils/formatDuration"; 
+import SortableTrackItem from "../components/Playlist/SortableTrackItem";
 
 import LoginHero from "../components/LoginHero/LoginHero";
 import AuthButton from "../components/AuthButton/AuthButton";
@@ -18,6 +20,8 @@ import SearchResults from "../components/SearchResults/SearchResults";
 import Playlist from "../components/Playlist/Playlist";
 
 import styles from "../App.module.scss";
+
+const DRAG_THRESHOLD = 5;
 
 export default function HomePage() {
   const tokens = getStoredTokens();
@@ -42,6 +46,8 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [activeTrack, setActiveTrack] = useState<Track | null>(null);
+
+  const [activeTrackSource, setActiveTrackSource] = useState<"search" | "playlist" | null>(null);
 
   useEffect(() => {
     async function loadUser() {
@@ -121,28 +127,110 @@ export default function HomePage() {
     !loading && !error && results.length === 0 && query.trim() !== "";
 
   function handleDragStart(event: any) {
-    setActiveTrack(event.active.data.current);
+    const activeId = event.active.id.toString();
+
+    // ✅ Case 1: Dragging from search results
+    if (activeId.startsWith("search-")) {
+      const track = event.active.data.current;
+      setActiveTrack(track ?? null);
+      setActiveTrackSource("search");
+      return;
+    }
+
+    // ✅ Case 2: Dragging from playlist (sortable)
+    if (activeId.startsWith("playlist-")) {
+      const trackId = activeId.replace("playlist-", "");
+
+      const track = playlistTracks.find((t) => t.id === trackId);
+
+      setActiveTrack(track ?? null);
+      setActiveTrackSource("playlist");
+      return;
+    }
+
+    // ✅ Fallback (should not happen)
+    setActiveTrack(null);
+    setActiveTrackSource(null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
+    const { active, over, delta } = event;
+    const trackId = active.id.toString().replace("search-", "");
+    
+    if (Math.abs(delta.x) < DRAG_THRESHOLD && Math.abs(delta.y) < DRAG_THRESHOLD) {
+      setActiveTrack(null);
+      return;
+    }
+    
+    if (!over) {
+      setActiveTrack(null);
+      return;
+    }
 
-    // If dropped in playlist
-    if (over?.id === "playlist-dropzone") {
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+    
+    const isFromSearch = activeId.startsWith("search-");
+    const isFromPlaylist = activeId.startsWith("playlist-");
+ 
+    // CASE 1: Dropping from search into playlist
+    if (
+      isFromSearch && 
+      ( 
+        over?.id === "playlist-dropzone" || overId.startsWith("playlist-")
+      )
+    ){
       const track = active.data.current as Track;
       addTrack(track);
+      setActiveTrack(null);
+      return;
     }
+
+    // CASE 2: Reordering within playlist
+    if (isFromPlaylist) {
+      setPlaylistTracks((prev) => {
+        const oldIndex = prev.findIndex(
+          (t) => `playlist-${t.id}` === active.id
+        );
+
+        if (oldIndex === -1) return prev;
+
+        let newIndex;
+
+        if (over.id.toString().startsWith("playlist-")) {
+          newIndex = prev.findIndex(
+            (t) => `playlist-${t.id}` === over.id
+          );
+        } else {
+          newIndex = prev.length - 1;
+        }
+
+        if (newIndex === -1) return prev;
+
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+
     setActiveTrack(null);
+    setActiveTrackSource(null);
   }
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+
+    <DndContext 
+      collisionDetection={closestCorners} 
+      onDragStart={handleDragStart} 
+      onDragEnd={handleDragEnd}
+    >
+
       <div className={styles.appShell}>
+
         <Header 
           isLoggedIn={isLoggedIn} 
           userName={user?.display_name} 
           onLogout={handleLogout}
         />
+
         <main className={styles.main}>
           <section className={styles.leftCol} aria-label="Search and results">
             <h2 className={styles.sectionTitle}>Browse Music</h2>
@@ -167,6 +255,7 @@ export default function HomePage() {
                   error={error}
                   query={query}
                 />
+
               </>
             )}
           </section>
@@ -187,21 +276,21 @@ export default function HomePage() {
               playlistCount={playlistCount}
               saving={saving}
             />
+            
           </section>
         </main>
       </div>
 
       <DragOverlay>
         {activeTrack ? (
-          <div className={styles.dragOverlayCard}>
-            <img src={activeTrack.imageUrl} className={styles.overlayImage} />
-            <div>
-              <p className={styles.overlayTitle}>{activeTrack.name}</p>
-              <p className={styles.overlayArtist}>{activeTrack.artist}</p>
-            </div>
-          </div>
+          <SortableTrackItem
+            track={activeTrack}
+            onRemove={undefined as any}
+            showDragHandle={activeTrackSource === "playlist"} // 🔥 KEY LINE
+          />
         ) : null}
       </DragOverlay>
+
     </DndContext>
   );
 }
