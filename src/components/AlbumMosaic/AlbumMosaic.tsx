@@ -16,6 +16,16 @@ import album13 from "../../assets/albums/album13.png";
 import album14 from "../../assets/albums/album14.png";
 import album15 from "../../assets/albums/album15.png";
 import album16 from "../../assets/albums/album16.png";
+import album17 from "../../assets/albums/album17.png";
+import album18 from "../../assets/albums/album18.png";
+import album19 from "../../assets/albums/album19.png";
+import album20 from "../../assets/albums/album20.png";
+import album21 from "../../assets/albums/album21.png";
+import album22 from "../../assets/albums/album22.png";
+import album23 from "../../assets/albums/album23.png";
+import album24 from "../../assets/albums/album24.png";
+import album25 from "../../assets/albums/album25.png";
+
 
 const albums = [
   album1,
@@ -33,7 +43,16 @@ const albums = [
   album13,
   album14,
   album15,
-  album16   
+  album16,
+  album17,
+  album18,
+  album19,
+  album20,
+  album21,
+  album22,   
+  album23,
+  album24,
+  album25  
 ];
 
 export default function AlbumMosaic() {
