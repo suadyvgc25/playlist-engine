@@ -25,6 +25,16 @@ import album22 from "../../assets/albums/album22.png";
 import album23 from "../../assets/albums/album23.png";
 import album24 from "../../assets/albums/album24.png";
 import album25 from "../../assets/albums/album25.png";
+import album26 from "../../assets/albums/album26.png";
+import album27 from "../../assets/albums/album27.png";
+import album28 from "../../assets/albums/album28.png";
+import album29 from "../../assets/albums/album29.png";
+import album30 from "../../assets/albums/album30.png";
+import album31 from "../../assets/albums/album31.png";
+import album32 from "../../assets/albums/album32.png";
+import album33 from "../../assets/albums/album33.png";
+import album34 from "../../assets/albums/album34.png";
+import album35 from "../../assets/albums/album35.png";
 
 
 const albums = [
@@ -52,17 +62,73 @@ const albums = [
   album22,   
   album23,
   album24,
-  album25  
+  album25,
+  album26,
+  album27,
+  album28,
+  album29,
+  album30,
+  album31,
+  album32,
+  album33,
+  album34,
+  album35
 ];
 
+function shuffle<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export default function AlbumMosaic() {
-  const repeated = Array.from({ length: 80 }, (_, i) => albums[i % albums.length])
-  .sort(() => Math.random() - 0.5); 
+  const cols = 8;              
+  const totalItems = 120;
+  const radius = 5;            
+
+  const grid: string[] = [];
+
+  for (let i = 0; i < totalItems; i++) {
+    const shuffled = shuffle(albums);
+
+    const row = Math.floor(i / cols);
+    const col = i % cols;
+
+    const picked =
+      shuffled.find((album) => {
+        // Check ALL neighbors within radius
+        for (let r = -radius; r <= radius; r++) {
+          for (let c = -radius; c <= radius; c++) {
+            if (r === 0 && c === 0) continue;
+
+            const checkRow = row + r;
+            const checkCol = col + c;
+
+            if (checkRow < 0 || checkCol < 0) continue;
+
+            const index = checkRow * cols + checkCol;
+
+            if (grid[index] === album) {
+              return false; //  Found duplicate in radius
+            }
+          }
+        }
+
+        return true; // Safe
+      }) 
+      // Fallback if impossible
+      || shuffled[0];
+
+    grid.push(picked);
+  }
 
   return (
     <div className={styles.grid}>
-      {repeated.map((src, i) => (
-        <img key={i} src={src}/>
+      {grid.map((src, i) => (
+        <img key={i} src={src} />
       ))}
     </div>
   );
