@@ -9,5 +9,6 @@ export function mapSpotifyTrackToTrack(item: any): Track {
     imageUrl: item.album?.images?.[0]?.url ?? "", 
     uri: item.uri,
     duration: item.duration_ms,
+    previewUrl: item.preview_url,
   };
 }

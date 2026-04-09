@@ -8,9 +8,12 @@ type Props = {
   track: Track;
   onRemove?: (id: string) => void;
   showDragHandle?: boolean;
+  onPlay?: (track: Track, opts?: { preview?: boolean }) => void;
+  currentTrack?: Track | null;
+  isPlaying?: boolean;
 };
 
-export default function SortableTrackItem({ track, onRemove, showDragHandle = true, }: Props) {
+export default function SortableTrackItem({ track, onRemove, showDragHandle = true,onPlay,currentTrack,isPlaying, }: Props) {
   const isOverlay = !onRemove;
 
   const {
@@ -28,6 +31,8 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const isActive = currentTrack?.id === track.id;
+
   return (
     <li
       ref={setNodeRef}
@@ -36,40 +41,64 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       {...(isOverlay ? {} : attributes)}
       className={styles.trackItem}
     >
+      <div
+        onClick={() => onPlay?.(track)}
+        className={`${styles.trackItemInner} ${isActive ? styles.active : ""}`}
+      >
 
-      {showDragHandle && (
-        <div {...(isOverlay ? {} : listeners)} className={styles.dragHandle}>
-          ⠿
+        {showDragHandle && (
+          <div {...(isOverlay ? {} : listeners)} className={styles.dragHandle}>
+            ⠿
+          </div>
+        )}
+
+        <div
+          className={styles.albumWrapper}
+          onClick={(e) => {
+            e.stopPropagation();
+            onPlay?.(track, { preview: false }); // FORCE LOCK
+          }}
+        >
+          <img
+            src={track.imageUrl}
+            alt={track.name}
+            className={styles.albumImage}
+          />
+
+          <div className={styles.overlay}>
+            {currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
+          </div>
         </div>
-      )}
 
-      <img
-        src={track.imageUrl}
-        alt={track.name}
-        className={styles.albumImage}
-      />
-
-      <div className={styles.trackInfo}>
-        <p className={styles.trackName}>{track.name}</p>
-        <p className={styles.artistName}>{track.artist}</p>
-      </div>
-
-      <div className={styles.trackActions}>
-        <p className={styles.trackDuration}>
-          {formatDuration(track.duration)}
-        </p>
-        <div className={styles.buttonSlot}>
-          {onRemove && (
-            <button
-              onClick={() => onRemove(track.id)}
-              className={styles.removeButton}
-            >
-              Remove
-            </button>
-          )}
+        <div className={styles.trackInfo}>
+          <p className={styles.trackName}>{track.name}</p>
+          <p className={styles.artistName}>{track.artist}</p>
         </div>
-      </div>
-      
+
+        {currentTrack?.id === track.id && isPlaying && (
+          <div className={styles.waveform}>
+            {Array.from({ length: 80 }).map((_, i) => (
+              <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
+            ))}
+          </div>
+        )}
+
+        <div className={styles.trackActions}>
+          {/* <p className={styles.trackDuration}>
+            {formatDuration(track.duration)}
+          </p> */}
+          <div className={styles.buttonSlot}>
+            {onRemove && (
+              <button
+                onClick={() => onRemove(track.id)}
+                className={styles.removeButton}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        </div>
+     </div> 
     </li>
   );
 }

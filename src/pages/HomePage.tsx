@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Track } from "../types/track";
 import type { SpotifyCurrentUser } from "../services/spotify/users";
 
@@ -6,6 +6,7 @@ import { getCurrentUserProfile } from "../services/spotify/users";
 import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
+import { fetchPreviewFromiTunes } from "../services/spotify/search";
 
 import { DndContext, DragEndEvent, DragOverlay, closestCorners } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -49,6 +50,22 @@ export default function HomePage() {
 
   const [activeTrackSource, setActiveTrackSource] = useState<"search" | "playlist" | null>(null);
 
+  // Player State
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isHoverPreview, setIsHoverPreview] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hoverTrackIdRef = useRef<string | null>(null);
+
+  if (!audioRef.current) {
+    audioRef.current = new Audio();
+  }
+
+  const audio = audioRef.current;
+
   useEffect(() => {
     async function loadUser() {
       if (!tokens) return;
@@ -61,6 +78,22 @@ export default function HomePage() {
     }
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (!audio) return;
+
+    audio.ontimeupdate = () => {
+      setProgress(audio.currentTime);
+    };
+
+    audio.onloadedmetadata = () => {
+      setDuration(audio.duration);
+    };
+
+    audio.onended = () => {
+      setIsPlaying(false);
+    };
+  }, [audio]);
 
   async function onSearch() {
     if (!query.trim()) return;
@@ -215,6 +248,100 @@ export default function HomePage() {
     setActiveTrackSource(null);
   }
 
+  async function playTrack(track: Track, { preview = false } = {}) {
+    console.log("TRACK CLICKED:", track);
+    // 🔥 HANDLE MODE CLEANLY (THIS FIXES EVERYTHING)
+    if (preview) {
+      setIsHoverPreview(true);
+    } else {
+      setIsHoverPreview(false);
+      hoverTrackIdRef.current = null;
+    }
+      
+
+    if (!audioRef.current) return;
+    const audio = audioRef.current;
+
+    // Track hover session
+    if (preview) {
+      hoverTrackIdRef.current = track.id;
+    }
+
+    let previewUrl = track.previewUrl;
+
+    // If Spotify doesn't have it → fetch from iTunes
+    if (!previewUrl) {
+      previewUrl = await fetchPreviewFromiTunes(track);
+        // Cancel if hover changed
+      if (preview && hoverTrackIdRef.current !== track.id) {
+        console.log("Hover cancelled, not playing");
+        return;
+      }
+    }
+
+    if (!previewUrl) {
+      console.warn("No preview available");
+
+      // Only update UI if user CLICKED (not hover)
+      if (!preview) {
+        setCurrentTrack(track);
+        setIsPlaying(false);
+      }
+      return;
+    }
+
+    // Stop previous audio before playing new
+    audio.pause();
+
+    audio.src = previewUrl;
+    audio.currentTime = 0;
+
+    audio.play().catch(console.error);
+
+    setCurrentTrack({
+      ...track,
+      previewUrl
+    });
+
+    setIsPlaying(true);
+
+    if (preview) {
+      setIsHoverPreview(true);
+    } else {
+      // STEP 2 — LOCK THE TRACK
+      setIsHoverPreview(false);
+
+      // STEP 3 — CLEAR HOVER SESSION
+      hoverTrackIdRef.current = null; // Lock overrides hover
+    }
+  }
+
+  function stopPreview() {
+    // DO NOT stop if track is locked
+    if (!isHoverPreview) return;
+    
+    hoverTrackIdRef.current = null;
+
+    if (!audioRef.current) return;
+
+    audioRef.current.pause();
+    setIsPlaying(false); 
+  }
+
+  function pauseTrack() {
+    audio.pause();
+    setIsPlaying(false);
+  }
+
+  function resumeTrack() {
+    audio.play();
+    setIsPlaying(true);
+  }
+
+  function seek(time: number) {
+    audio.currentTime = time;
+  }
+
   return (
 
     <DndContext 
@@ -254,6 +381,11 @@ export default function HomePage() {
                   loading={loading}
                   error={error}
                   query={query}
+                  onPlay={playTrack}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
+                  stopPreview={stopPreview}
+                  isHoverPreview={isHoverPreview}
                 />
 
               </>
@@ -275,6 +407,9 @@ export default function HomePage() {
               onSave={handleSavePlaylist}
               playlistCount={playlistCount}
               saving={saving}
+              onPlay={playTrack}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
             />
             
           </section>
@@ -286,7 +421,7 @@ export default function HomePage() {
           <SortableTrackItem
             track={activeTrack}
             onRemove={undefined as any}
-            showDragHandle={activeTrackSource === "playlist"} // 🔥 KEY LINE
+            showDragHandle={activeTrackSource === "playlist"} 
           />
         ) : null}
       </DragOverlay>
