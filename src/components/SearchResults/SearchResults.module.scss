@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width:100%;
+  max-width:100%;
 }
 
 .headerRow {
@@ -36,6 +38,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .trackItem {
@@ -43,7 +47,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 80px;     
+  height: 72px;   
+  max-width: 100%;  
   min-height: 80px;
   width: 100%;
   cursor: grab;
@@ -64,6 +69,7 @@
   transition: all 0.2s ease;
   justify-content: space-between; 
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .trackItem:active {
@@ -104,7 +110,8 @@
 .trackInfo {
   display: flex;
   flex-direction: column;
-  flex:0 1 200px; 
+  //flex:0 1 200px; 
+  flex:1;
   min-width: 0;
 }
 
@@ -130,7 +137,7 @@
 .trackActions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  //justify-content: flex-end;
   gap: 12px;
   min-width: 80px;
   flex-shrink: 0;
@@ -212,6 +219,8 @@
   width: 120px;    
   flex-shrink: 0;
   overflow: hidden;
+  transition: width 0.25s ease, opacity 0.2s ease;
+  overflow: hidden;
 }
 
 .waveform span {
@@ -249,4 +258,6 @@
   display: flex;
   align-items: center;
   gap: 10px; // 🔥 THIS fixes your spacing
+  flex:1;
+  min-width: 0;
 }

@@ -87,19 +87,23 @@ export default function SearchResults({
               
               
               {/* 🔥 Waveform moved HERE */}
-              {isCurrentPlaying && (
-                <div
+              
+              <div
                   className={styles.waveform}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    stopPreview();
+                  style={{
+                    opacity: isCurrentPlaying ? 1 : 0,
+                    width: isCurrentPlaying ? "180px" : "0px",
                   }}
-                >
+                  // onClick={(e) => {
+                  //   e.stopPropagation();
+                  //   stopPreview();
+                  // }}
+              >
                   {Array.from({ length: 60 }).map((_, i) => (
                     <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
                   ))}
-                </div>
-              )}
+              </div>
+              
 
               <div className={styles.trackActions}>
                 <div className={styles.playerSlot}>
