@@ -54,6 +54,7 @@ export default function HomePage() {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isHoverPreview, setIsHoverPreview] = useState(false);
+  const [tracksWithoutPreviews, setTracksWithoutPreviews] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -65,6 +66,15 @@ export default function HomePage() {
   }
 
   const audio = audioRef.current;
+
+  function clearAudio(audio: HTMLAudioElement) {
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+  }
 
   useEffect(() => {
     async function loadUser() {
@@ -122,6 +132,11 @@ export default function HomePage() {
 
   function removeTrack(trackId: string) {
     setPlaylistTracks((prev) => prev.filter((t) => t.id !== trackId));
+    setTracksWithoutPreviews((prev) => {
+      const next = new Set(prev);
+      next.delete(trackId);
+      return next;
+    });
   }
 
   function handlePlaylistNameChange(value: string) {
@@ -130,6 +145,7 @@ export default function HomePage() {
 
   function clearPlaylist() {
     setPlaylistTracks([]);
+    setTracksWithoutPreviews(new Set());
   }
 
   async function handleSavePlaylist() {
@@ -265,6 +281,12 @@ export default function HomePage() {
 
     // HANDLE TOGGLE FIRST 
     if (toggle && isSameTrack) {
+      if (!track.previewUrl && !audio.currentSrc) {
+        clearAudio(audio);
+        setCurrentTrack(track);
+        return;
+      }
+
       if (isPlaying) {
         audio.pause();
         setIsPlaying(false);
@@ -278,6 +300,8 @@ export default function HomePage() {
     // Track hover session
     if (preview) {
       hoverTrackIdRef.current = track.id;
+    } else {
+      clearAudio(audio);
     }
 
     let previewUrl = track.previewUrl;
@@ -297,8 +321,8 @@ export default function HomePage() {
 
       // Only update UI if user CLICKED (not hover)
       if (!preview) {
-        setCurrentTrack(track);
-        setIsPlaying(false);
+        clearAudio(audio);
+        setTracksWithoutPreviews((prev) => new Set(prev).add(track.id));
       }
       return;
     }
@@ -315,6 +339,21 @@ export default function HomePage() {
       ...track,
       previewUrl
     });
+    setTracksWithoutPreviews((prev) => {
+      const next = new Set(prev);
+      next.delete(track.id);
+      return next;
+    });
+    setPlaylistTracks((prev) =>
+      prev.map((playlistTrack) =>
+        playlistTrack.id === track.id ? { ...playlistTrack, previewUrl } : playlistTrack
+      )
+    );
+    setResults((prev) =>
+      prev.map((resultTrack) =>
+        resultTrack.id === track.id ? { ...resultTrack, previewUrl } : resultTrack
+      )
+    );
 
     setIsPlaying(true);
 
@@ -399,6 +438,7 @@ export default function HomePage() {
                   isPlaying={isPlaying}
                   stopPreview={stopPreview}
                   isHoverPreview={isHoverPreview}
+                  tracksWithoutPreviews={tracksWithoutPreviews}
                 />
 
               </>
@@ -423,6 +463,7 @@ export default function HomePage() {
               onPlay={playTrack}
               currentTrack={currentTrack}
               isPlaying={isPlaying}
+              tracksWithoutPreviews={tracksWithoutPreviews}
             />
             
           </section>
@@ -442,4 +483,3 @@ export default function HomePage() {
     </DndContext>
   );
 }
-

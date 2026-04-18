@@ -11,6 +11,7 @@ type Props = {
   isPlaying: boolean;
   stopPreview: () => void;
   isHoverPreview: boolean;
+  previewUnavailable?: boolean;
 };
 
 export default function SearchResultTrackItem({
@@ -21,6 +22,7 @@ export default function SearchResultTrackItem({
   isPlaying,
   stopPreview,
   isHoverPreview,
+  previewUnavailable = false,
 }: Props) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `search-${track.id}`,
@@ -35,7 +37,7 @@ export default function SearchResultTrackItem({
     (isHoverPreview || !isHoverDevice);
 
   const handleMobilePlayToggle = () => {
-    if (isHoverDevice) return;
+    if (isHoverDevice || previewUnavailable) return;
 
     const isSameTrack = currentTrack?.id === track.id;
     if (isSameTrack) {
@@ -54,19 +56,19 @@ export default function SearchResultTrackItem({
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
       onMouseEnter={() => {
-        if (!isHoverDevice) return;
+        if (!isHoverDevice || previewUnavailable) return;
         onPlay(track, { preview: true });
       }}
 
       onMouseLeave={() => {
-        if (!isHoverDevice) return;
+        if (!isHoverDevice || previewUnavailable) return;
         stopPreview();
       }}
 
     >
       <div className={styles.left}>
         <div className={styles.dragHandle}>
-          <div className={styles.albumWrapper}>
+          <div className={`${styles.albumWrapper} ${previewUnavailable ? styles.noPreview : ""}`}>
             <img
               src={track.imageUrl}
               alt={`${track.name} cover`}
@@ -76,8 +78,12 @@ export default function SearchResultTrackItem({
             <button
               type="button"
               className={styles.mobilePlayButton}
+              disabled={previewUnavailable}
+              aria-disabled={previewUnavailable}
               aria-label={
-                currentTrack?.id === track.id && isPlaying
+                previewUnavailable
+                  ? `No preview available for ${track.name}`
+                  : currentTrack?.id === track.id && isPlaying
                   ? `Pause ${track.name}`
                   : `Play ${track.name}`
               }
@@ -88,7 +94,7 @@ export default function SearchResultTrackItem({
               }}
             >
               <span aria-hidden="true">
-                {currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
+                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
               </span>
             </button>
           </div>

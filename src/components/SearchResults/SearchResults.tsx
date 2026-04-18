@@ -14,6 +14,7 @@ type Props = {
   isPlaying: boolean;
   stopPreview: () => void;
   isHoverPreview: boolean;
+  tracksWithoutPreviews: Set<string>;
 };
 
 export default function SearchResults({
@@ -25,6 +26,7 @@ export default function SearchResults({
   isPlaying,
   stopPreview,
   isHoverPreview,
+  tracksWithoutPreviews,
 }: Props) {
   return (
     <div className={styles.results}>
@@ -46,6 +48,7 @@ export default function SearchResults({
             isPlaying={isPlaying}
             stopPreview={stopPreview}
             isHoverPreview={isHoverPreview}
+            previewUnavailable={tracksWithoutPreviews.has(track.id)}
           />
         ))}
       </ul>

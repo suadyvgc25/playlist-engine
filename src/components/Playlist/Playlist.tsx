@@ -17,6 +17,7 @@ type Props = {
   onPlay?: (track: Track, opts?: { preview?: boolean; toggle?: boolean }) => void;
   currentTrack: Track | null;
   isPlaying: boolean;
+  tracksWithoutPreviews: Set<string>;
 };
 
 export default function Playlist({
@@ -31,6 +32,7 @@ export default function Playlist({
   onPlay,
   currentTrack,
   isPlaying,
+  tracksWithoutPreviews,
 }: Props) {
 
   const { setNodeRef:setDroppableRef } = useDroppable({
@@ -73,6 +75,7 @@ export default function Playlist({
                 onPlay={(track, opts) => onPlay?.(track, { preview: false, ...opts })}
                 currentTrack={currentTrack}
                 isPlaying={isPlaying}
+                previewUnavailable={tracksWithoutPreviews.has(track.id)}
               />
             ))}
           </ul>

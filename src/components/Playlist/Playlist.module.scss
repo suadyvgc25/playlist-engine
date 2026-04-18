@@ -333,6 +333,7 @@
   position: relative;
   width: 56px;
   height: 56px;
+  cursor: pointer;
 }
 
 .albumImage {
@@ -356,6 +357,25 @@
 
 .albumWrapper:hover .overlay {
   opacity: 1;
+}
+
+.noPreview {
+  cursor: default;
+}
+
+.noPreview .albumImage {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.noPreview .albumWrapper {
+  cursor: not-allowed;
+}
+
+.noPreview .overlay {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.62);
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .waveform {

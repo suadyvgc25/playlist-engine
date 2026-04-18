@@ -2,7 +2,6 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styles from "./Playlist.module.scss";
 import type { Track } from "../../types/track";
-import { formatDuration } from "../../utils/formatDuration";
 
 type Props = {
   track: Track;
@@ -11,9 +10,10 @@ type Props = {
   onPlay?: (track: Track, opts?: { preview?: boolean; toggle?: boolean }) => void;
   currentTrack?: Track | null;
   isPlaying?: boolean;
+  previewUnavailable?: boolean;
 };
 
-export default function SortableTrackItem({ track, onRemove, showDragHandle = true,onPlay,currentTrack,isPlaying, }: Props) {
+export default function SortableTrackItem({ track, onRemove, showDragHandle = true,onPlay,currentTrack,isPlaying, previewUnavailable = false, }: Props) {
   const isOverlay = !onRemove;
 
   const {
@@ -32,7 +32,17 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
   };
 
   const isActive = currentTrack?.id === track.id;
-  const isActivePlaying = currentTrack?.id === track.id && isPlaying;
+  const isActivePlaying = !previewUnavailable && currentTrack?.id === track.id && isPlaying;
+
+  const handlePlay = () => {
+    if (previewUnavailable) return;
+
+    if (isActive) {
+      onPlay?.(track, { preview: false, toggle: true });
+    } else {
+      onPlay?.(track, { preview: false });
+    }
+  };
   
   return (
     <li
@@ -43,8 +53,8 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       className={styles.trackItem}
     >
       <div
-        onClick={() => onPlay?.(track)}
-        className={`${styles.trackItemInner} ${isActive ? styles.active : ""}`}
+        onClick={handlePlay}
+        className={`${styles.trackItemInner} ${isActive ? styles.active : ""} ${previewUnavailable ? styles.noPreview : ""}`}
       >
 
         {showDragHandle && (
@@ -57,15 +67,9 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           className={styles.albumWrapper}
           onClick={(e) => {
             e.stopPropagation();
-            const isActive = currentTrack?.id === track.id;
-            if (isActive) {
-              // toggle play/pause
-              onPlay?.(track, { preview: false, toggle: true });
-            } else {
-              // play new track
-              onPlay?.(track, { preview: false });
-            }
+            handlePlay();
           }}
+          aria-disabled={previewUnavailable}
         >
           <img
             src={track.imageUrl}
@@ -74,7 +78,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           />
 
           <div className={styles.overlay}>
-            {currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
+            {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
           </div>
         </div>
 

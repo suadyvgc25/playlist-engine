@@ -6,5 +6,5 @@ export type Track = {
   imageUrl?: string;
   uri: string;
   duration: number;
-  previewUrl?: string;
+  previewUrl?: string | null;
 };
