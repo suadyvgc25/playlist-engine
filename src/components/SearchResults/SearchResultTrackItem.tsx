@@ -1,5 +1,4 @@
 import { useDraggable } from "@dnd-kit/core";
-import { useRef } from "react";
 import styles from "./SearchResults.module.scss";
 import type { Track } from "../../types/track";
 import { formatDuration } from "../../utils/formatDuration";
@@ -28,14 +27,23 @@ export default function SearchResultTrackItem({
     data: track,
   });
 
-  const startPos = useRef<{ x: number; y: number } | null>(null);
-
   const isHoverDevice = window.matchMedia("(hover: hover)").matches;
 
   const isCurrentPlaying =
     currentTrack?.id === track.id &&
     isPlaying &&
     (isHoverPreview || !isHoverDevice);
+
+  const handleMobilePlayToggle = () => {
+    if (isHoverDevice) return;
+
+    const isSameTrack = currentTrack?.id === track.id;
+    if (isSameTrack) {
+      onPlay(track, { preview: false, toggle: true });
+    } else {
+      onPlay(track, { preview: false });
+    }
+  };
 
   return (
     <li
@@ -55,55 +63,34 @@ export default function SearchResultTrackItem({
         stopPreview();
       }}
 
-    //   onPointerDown={(e) => {
-    //     if (isHoverDevice) return;
-
-    //     startPos.current = {
-    //       x: e.clientX,
-    //       y: e.clientY,
-    //     };
-    //   }}
-
-      onClick={(e) => {
-        if (isHoverDevice) return;
-        // if (!startPos.current) return;
-
-        // const dx = Math.abs(e.clientX - startPos.current.x);
-        // const dy = Math.abs(e.clientY - startPos.current.y);
-
-        // const isTap = dx < 5 && dy < 5;
-        // if (!isTap) return;
-
-        const isSameTrack = currentTrack?.id === track.id;
-
-        if (isSameTrack) {
-          onPlay(track, { preview: false, toggle: true });
-        } else {
-          onPlay(track, { preview: false });
-        }
-      }}
     >
       <div className={styles.left}>
-        <div
-          
-          className={styles.dragHandle}
-          //onClick={(e) => e.stopPropagation()}
-        >
-          <div className={styles.albumWrapper}
-            //    onPointerDown={(e) => {
-            //     e.stopPropagation();}}
-          >
+        <div className={styles.dragHandle}>
+          <div className={styles.albumWrapper}>
             <img
               src={track.imageUrl}
               alt={`${track.name} cover`}
               className={styles.albumImage}
             />
 
-            {!isHoverDevice && (
-              <div className={styles.overlay}>
+            <button
+              type="button"
+              className={styles.mobilePlayButton}
+              aria-label={
+                currentTrack?.id === track.id && isPlaying
+                  ? `Pause ${track.name}`
+                  : `Play ${track.name}`
+              }
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleMobilePlayToggle();
+              }}
+            >
+              <span aria-hidden="true">
                 {currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
-              </div>
-            )}
+              </span>
+            </button>
           </div>
         </div>
 
