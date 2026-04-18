@@ -32,7 +32,8 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
   };
 
   const isActive = currentTrack?.id === track.id;
-
+  const isActivePlaying = currentTrack?.id === track.id && isPlaying;
+  
   return (
     <li
       ref={setNodeRef}
@@ -82,14 +83,19 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           <p className={styles.artistName}>{track.artist}</p>
         </div>
 
-        {currentTrack?.id === track.id && isPlaying && (
-          <div className={styles.waveform}>
-            {Array.from({ length: 80 }).map((_, i) => (
+        
+        <div 
+          className={styles.waveform}
+          style={{
+            opacity: isActivePlaying ? 1 : 0,
+            width: isActivePlaying ? "180px" : "0px",
+          }}
+        >
+            {Array.from({ length: 60 }).map((_, i) => (
               <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
             ))}
-          </div>
-        )}
-
+        </div>
+        
         <div className={styles.trackActions}>
           {/* <p className={styles.trackDuration}>
             {formatDuration(track.duration)}
