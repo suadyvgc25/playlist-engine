@@ -248,19 +248,32 @@ export default function HomePage() {
     setActiveTrackSource(null);
   }
 
-  async function playTrack(track: Track, { preview = false } = {}) {
+  async function playTrack(track: Track, { preview = false, toggle = false } = {}) {
     console.log("TRACK CLICKED:", track);
-    // 🔥 HANDLE MODE CLEANLY (THIS FIXES EVERYTHING)
+    // HANDLE MODE CLEANLY (THIS FIXES EVERYTHING)
     if (preview) {
       setIsHoverPreview(true);
     } else {
       setIsHoverPreview(false);
       hoverTrackIdRef.current = null;
     }
-      
 
     if (!audioRef.current) return;
     const audio = audioRef.current;
+
+    const isSameTrack = currentTrack?.id === track.id;
+
+    // HANDLE TOGGLE FIRST 
+    if (toggle && isSameTrack) {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        audio.play().catch(console.error);
+        setIsPlaying(true);
+      }
+      return; // prevents restart bug
+    }
 
     // Track hover session
     if (preview) {

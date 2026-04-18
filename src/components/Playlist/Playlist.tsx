@@ -14,7 +14,7 @@ type Props = {
   onSave: () => void;
   playlistCount: number;
   saving: boolean;
-  onPlay: (track: Track, opts?: { preview?: boolean }) => void;
+  onPlay?: (track: Track, opts?: { preview?: boolean; toggle?: boolean }) => void;
   currentTrack: Track | null;
   isPlaying: boolean;
 };
@@ -70,7 +70,7 @@ export default function Playlist({
                 key={`playlist-${track.id}`}
                 track={track}
                 onRemove={onRemove}
-                onPlay={(track) => onPlay(track, { preview: false })}
+                onPlay={(track, opts) => onPlay?.(track, { preview: false, ...opts })}
                 currentTrack={currentTrack}
                 isPlaying={isPlaying}
               />

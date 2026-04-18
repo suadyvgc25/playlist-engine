@@ -8,7 +8,7 @@ type Props = {
   track: Track;
   onRemove?: (id: string) => void;
   showDragHandle?: boolean;
-  onPlay?: (track: Track, opts?: { preview?: boolean }) => void;
+  onPlay?: (track: Track, opts?: { preview?: boolean; toggle?: boolean }) => void;
   currentTrack?: Track | null;
   isPlaying?: boolean;
 };
@@ -56,7 +56,14 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           className={styles.albumWrapper}
           onClick={(e) => {
             e.stopPropagation();
-            onPlay?.(track, { preview: false }); // FORCE LOCK
+            const isActive = currentTrack?.id === track.id;
+            if (isActive) {
+              // toggle play/pause
+              onPlay?.(track, { preview: false, toggle: true });
+            } else {
+              // play new track
+              onPlay?.(track, { preview: false });
+            }
           }}
         >
           <img
