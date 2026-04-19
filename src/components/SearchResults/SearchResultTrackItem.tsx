@@ -35,6 +35,7 @@ export default function SearchResultTrackItem({
     currentTrack?.id === track.id &&
     isPlaying &&
     (isHoverPreview || !isHoverDevice);
+  const isActive = currentTrack?.id === track.id;
 
   const handleMobilePlayToggle = () => {
     if (isHoverDevice || previewUnavailable) return;
@@ -50,9 +51,10 @@ export default function SearchResultTrackItem({
   return (
     <li
       ref={setNodeRef}
+      data-search-track-id={track.id}
       {...attributes}
       {...listeners}
-      className={styles.trackItem}
+      className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
       onMouseEnter={() => {
@@ -110,7 +112,7 @@ export default function SearchResultTrackItem({
         className={styles.waveform}
         style={{
           opacity: isCurrentPlaying ? 1 : 0,
-          width: isCurrentPlaying ? "180px" : "0px",
+          width: "180px",
         }}
       >
         {Array.from({ length: 60 }).map((_, i) => (

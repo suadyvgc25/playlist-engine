@@ -53,6 +53,7 @@
 }
 
 .trackItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px; 
@@ -71,6 +72,9 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .trackItem:hover {
@@ -191,7 +195,7 @@
 }
 
 .saveButton {
-  flex: 1;            
+  flex: 1;
   height: 58px;
   padding: 0 34px;
   display: inline-flex;
@@ -204,20 +208,23 @@
   font-weight: 950;
   letter-spacing: -0.02em;
   cursor: pointer;
-  background-color: #130f0f;
+  background-color: #6f2e77;
   color:white;
   transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+  box-shadow: 0 12px 32px rgba(213, 135, 235, 0.35);
 }
 
 .saveButton:hover {
   transform: translateY(-1px);
   filter: brightness(1.02);
-  background-color: #6f2e77;
   box-shadow: 0 12px 32px rgba(213, 135, 235, 0.35);
 }
 
 .saveButton:active {
   transform: translateY(0);
+  background-color: #130f0f;
+  color: white;
+  filter: none;
 }
 
 /* Mobile: stack buttons if needed */
@@ -233,6 +240,7 @@
   }
 
   .saveButton {
+    flex: 0 0 auto;
     width: 100%;
   }
 }
@@ -318,16 +326,21 @@
   //position: relative;
   gap: 16px;
   height: 80px;       // ✅ NEVER CHANGES
-  //width: 100%;
+  width: 100%;
+  box-sizing: border-box;
   //overflow: hidden;   // ✅ NOTHING CAN EXPAND
   padding-right: 140px;
 }
 
-//.active {
-  // border: 1px solid #a855f7;
-  // box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
-  // background: rgba(168, 85, 247, 0.1);
-//}
+.trackItem.active,
+.trackItem.active:hover {
+  border: 1px solid #a855f7;
+  box-shadow:
+    0 0 14px rgba(168, 85, 247, 0.62),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background-color: #321b35;
+}
 
 .albumWrapper {
   position: relative;
@@ -427,4 +440,95 @@
 @keyframes bounce {
   0%, 100% { height: 4px; }
   50% { height: 20px; }
+}
+
+@media (max-width: 720px) {
+  .playlistWrapper,
+  .playlist {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .playlist {
+    gap: 14px;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .titleInput {
+    height: 46px;
+    border-radius: 12px;
+    padding: 0 14px;
+  }
+
+  .count {
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .trackList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .trackItem {
+    border-radius: 12px;
+    touch-action: pan-y;
+  }
+
+  .trackItemInner {
+    grid-template-columns: 18px 48px minmax(0, 1fr) auto;
+    gap: 10px;
+    height: 74px;
+    padding-right: 92px;
+  }
+
+  .dragHandle {
+    padding-left: 6px;
+  }
+
+  .albumWrapper {
+    width: 46px;
+    height: 46px;
+  }
+
+  .waveform {
+    display: none;
+  }
+
+  .trackActions {
+    right: 12px;
+  }
+
+  .buttonSlot {
+    width: 76px;
+  }
+
+  .removeButton {
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  .actions {
+    gap: 10px;
+    margin-top: 0;
+  }
+
+  .clearButton,
+  .saveButton {
+    height: 48px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
 }

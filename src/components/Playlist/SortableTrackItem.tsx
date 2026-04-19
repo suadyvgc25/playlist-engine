@@ -50,11 +50,11 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       style={style}
       {...attributes}
       {...(isOverlay ? {} : attributes)}
-      className={styles.trackItem}
+      className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
     >
       <div
         onClick={handlePlay}
-        className={`${styles.trackItemInner} ${isActive ? styles.active : ""} ${previewUnavailable ? styles.noPreview : ""}`}
+        className={`${styles.trackItemInner} ${previewUnavailable ? styles.noPreview : ""}`}
       >
 
         {showDragHandle && (

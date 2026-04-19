@@ -45,10 +45,12 @@ export default function HomePage() {
   const [results, setResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<"results" | "playlist">("results");
 
   const [activeTrack, setActiveTrack] = useState<Track | null>(null);
 
   const [activeTrackSource, setActiveTrackSource] = useState<"search" | "playlist" | null>(null);
+  const [activeOverlaySize, setActiveOverlaySize] = useState<{ width: number; height: number } | null>(null);
 
   // Player State
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -110,6 +112,7 @@ export default function HomePage() {
 
     setError(null);
     setLoading(true);
+    setMobileView("results");
 
     try {
       const tracks = await searchTracks(query);
@@ -180,7 +183,18 @@ export default function HomePage() {
 
     // ✅ Case 1: Dragging from search results
     if (activeId.startsWith("search-")) {
+      const trackId = activeId.replace("search-", "");
+      const sourceRow = document.querySelector<HTMLElement>(
+        `[data-search-track-id="${trackId}"]`
+      );
+      const sourceRect = sourceRow?.getBoundingClientRect();
       const track = event.active.data.current;
+
+      setActiveOverlaySize(
+        sourceRect
+          ? { width: sourceRect.width, height: sourceRect.height }
+          : null
+      );
       setActiveTrack(track ?? null);
       setActiveTrackSource("search");
       return;
@@ -188,10 +202,16 @@ export default function HomePage() {
 
     // ✅ Case 2: Dragging from playlist (sortable)
     if (activeId.startsWith("playlist-")) {
+      const activeRect = event.active.rect.current?.initial;
       const trackId = activeId.replace("playlist-", "");
 
       const track = playlistTracks.find((t) => t.id === trackId);
 
+      setActiveOverlaySize(
+        activeRect
+          ? { width: activeRect.width, height: activeRect.height }
+          : null
+      );
       setActiveTrack(track ?? null);
       setActiveTrackSource("playlist");
       return;
@@ -200,6 +220,7 @@ export default function HomePage() {
     // ✅ Fallback (should not happen)
     setActiveTrack(null);
     setActiveTrackSource(null);
+    setActiveOverlaySize(null);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -208,11 +229,15 @@ export default function HomePage() {
     
     if (Math.abs(delta.x) < DRAG_THRESHOLD && Math.abs(delta.y) < DRAG_THRESHOLD) {
       setActiveTrack(null);
+      setActiveTrackSource(null);
+      setActiveOverlaySize(null);
       return;
     }
     
     if (!over) {
       setActiveTrack(null);
+      setActiveTrackSource(null);
+      setActiveOverlaySize(null);
       return;
     }
 
@@ -232,6 +257,8 @@ export default function HomePage() {
       const track = active.data.current as Track;
       addTrack(track);
       setActiveTrack(null);
+      setActiveTrackSource(null);
+      setActiveOverlaySize(null);
       return;
     }
 
@@ -262,6 +289,7 @@ export default function HomePage() {
 
     setActiveTrack(null);
     setActiveTrackSource(null);
+    setActiveOverlaySize(null);
   }
 
   async function playTrack(track: Track, { preview = false, toggle = false } = {}) {
@@ -394,6 +422,23 @@ export default function HomePage() {
     audio.currentTime = time;
   }
 
+  function playNextTrack() {
+    const playbackQueue = currentTrack && playlistTracks.some((track) => track.id === currentTrack.id)
+      ? playlistTracks
+      : results;
+
+    if (playbackQueue.length === 0) return;
+
+    const currentIndex = currentTrack
+      ? playbackQueue.findIndex((track) => track.id === currentTrack.id)
+      : -1;
+    const nextTrack = playbackQueue[(currentIndex + 1) % playbackQueue.length];
+
+    if (nextTrack) {
+      playTrack(nextTrack, { preview: false });
+    }
+  }
+
   return (
 
     <DndContext 
@@ -411,7 +456,27 @@ export default function HomePage() {
         />
 
         <main className={styles.main}>
-          <section className={styles.leftCol} aria-label="Search and results">
+          <div className={styles.mobileTabs} aria-label="Mobile playlist navigation">
+            <button
+              type="button"
+              className={`${styles.mobileTabButton} ${mobileView === "results" ? styles.mobileTabButtonActive : ""}`}
+              onClick={() => setMobileView("results")}
+            >
+              Results
+            </button>
+            <button
+              type="button"
+              className={`${styles.mobileTabButton} ${mobileView === "playlist" ? styles.mobileTabButtonActive : ""}`}
+              onClick={() => setMobileView("playlist")}
+            >
+              Playlist ({playlistCount})
+            </button>
+          </div>
+
+          <section
+            className={`${styles.leftCol} ${mobileView === "results" ? styles.mobilePanelActive : styles.mobilePanelHidden}`}
+            aria-label="Search and results"
+          >
             <h2 className={styles.sectionTitle}>Browse Music</h2>
 
             {isLoggedIn && (
@@ -445,7 +510,10 @@ export default function HomePage() {
             )}
           </section>
 
-          <section className={styles.rightCol} aria-label="Playlist builder">
+          <section
+            className={`${styles.rightCol} ${mobileView === "playlist" ? styles.mobilePanelActive : styles.mobilePanelHidden}`}
+            aria-label="Playlist builder"
+          >
             <h2 className={styles.sectionTitle}>Playlist Builder</h2>
 
             {saveSuccess && <p style={{ color: "green" }}>{saveSuccess}</p>}
@@ -468,10 +536,77 @@ export default function HomePage() {
             
           </section>
         </main>
+
+        {currentTrack && (
+          <aside className={styles.miniPlayer} aria-label="Now playing">
+            <div className={styles.miniPlayerTop}>
+              <img
+                src={currentTrack.imageUrl}
+                alt={`${currentTrack.name} cover`}
+                className={styles.miniPlayerImage}
+              />
+              <div className={styles.miniPlayerInfo}>
+                <p className={styles.miniPlayerTrack}>{currentTrack.name}</p>
+                <p className={styles.miniPlayerArtist}>{currentTrack.artist}</p>
+              </div>
+              <div className={styles.miniPlayerControls}>
+                <button
+                  type="button"
+                  className={styles.miniPlayerButton}
+                  onClick={() => playTrack(currentTrack, { preview: false, toggle: true })}
+                  aria-label={isPlaying ? `Pause ${currentTrack.name}` : `Play ${currentTrack.name}`}
+                >
+                  {isPlaying ? "Pause" : "Play"}
+                </button>
+                <button
+                  type="button"
+                  className={styles.miniPlayerButton}
+                  onClick={playNextTrack}
+                  aria-label="Play next song"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+            <div className={styles.miniWaveform} aria-hidden="true">
+              {Array.from({ length: 56 }).map((_, i) => (
+                <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
+              ))}
+            </div>
+          </aside>
+        )}
       </div>
 
       <DragOverlay>
-        {activeTrack ? (
+        {activeTrack && activeTrackSource === "search" ? (
+          <div
+            className={styles.dragOverlayCard}
+            style={
+              activeOverlaySize
+                ? {
+                    width: activeOverlaySize.width,
+                    height: activeOverlaySize.height,
+                  }
+                : undefined
+            }
+          >
+            <img
+              src={activeTrack.imageUrl}
+              alt={`${activeTrack.name} cover`}
+              className={styles.overlayImage}
+            />
+            <div className={styles.overlayInfo}>
+              <p className={styles.overlayTitle}>{activeTrack.name}</p>
+              <p className={styles.overlayArtist}>{activeTrack.artist}</p>
+            </div>
+            <span className={styles.overlayDuration}>
+              {formatDuration(activeTrack.duration)}
+            </span>
+            <button type="button" className={styles.overlayAddButton}>
+              + Add
+            </button>
+          </div>
+        ) : activeTrack ? (
           <SortableTrackItem
             track={activeTrack}
             onRemove={undefined as any}

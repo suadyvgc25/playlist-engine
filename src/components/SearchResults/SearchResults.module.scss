@@ -44,7 +44,8 @@
 
 .trackItem {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px auto;
   align-items: center;
   gap: 12px;
   height: 72px;   
@@ -67,7 +68,6 @@
     inset 0 1px 1px rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
-  justify-content: space-between; 
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -113,6 +113,7 @@
   //flex:0 1 200px; 
   flex:1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .trackName {
@@ -188,12 +189,15 @@
 
 .active {
   border: 1px solid #a855f7;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
-  background: rgba(168, 85, 247, 0.1);
+  box-shadow:
+    0 0 14px rgba(168, 85, 247, 0.62),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  background-color: #321b35;
 }
 
 .playerSlot {
-  // width: 60px;
+  width: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -208,7 +212,7 @@
 }
 
 .waveform {
-  flex: 1;                 // 🔥 THIS pushes it to middle
+  width: 180px;
   display: flex;
   align-items: flex-end;
   justify-content: center; // centers the bars
@@ -216,8 +220,7 @@
   height: 20px;
   margin-left: 8px;
   margin-right: 8px;
-  width: 120px;    
-  flex-shrink: 0;
+  flex: 0 0 180px;
   overflow: hidden;
   transition: width 0.25s ease, opacity 0.2s ease;
   overflow: hidden;
@@ -258,14 +261,16 @@
   display: flex;
   align-items: center;
   gap: 10px; // 🔥 THIS fixes your spacing
-  flex:1;
+  width: 100%;
   min-width: 0;
+  overflow: hidden;
 }
 
 .albumWrapper {
   position: relative;
   width: 48px;
   height: 48px;
+  flex: 0 0 48px;
 }
 
 .noPreview .albumImage {
@@ -307,5 +312,64 @@
 @media (hover: none), (pointer: coarse) {
   .mobilePlayButton {
     display: flex;
+  }
+}
+
+@media (max-width: 720px) {
+  .results {
+    min-height: 0;
+    flex: 1;
+  }
+
+  .headerRow {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .headerRow h2 {
+    font-size: 17px;
+  }
+
+  .trackList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .trackItem {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 74px;
+    height: 74px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    touch-action: pan-y;
+  }
+
+  .albumImage,
+  .albumWrapper {
+    width: 46px;
+    height: 46px;
+  }
+
+  .trackActions {
+    gap: 8px;
+    min-width: 74px;
+  }
+
+  .playerSlot,
+  .trackDuration,
+  .waveform {
+    display: none;
+  }
+
+  .addButton {
+    min-width: 66px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
   }
 }

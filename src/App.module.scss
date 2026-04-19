@@ -15,6 +15,10 @@
   gap: 24px;
 }
 
+.mobileTabs {
+  display: none;
+}
+
 /* Cards */
 .leftCol,
 .rightCol {
@@ -66,15 +70,210 @@
   }
 } 
 
+.miniPlayer {
+  display: none;
+}
+
+.miniPlayerTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.miniPlayerImage {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.miniPlayerInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.miniPlayerTrack,
+.miniPlayerArtist {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniPlayerTrack {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.miniPlayerArtist {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.miniPlayerControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.miniPlayerButton {
+  min-width: 56px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.08)
+  );
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.miniWaveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 18px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.miniWaveform span {
+  width: 2px;
+  height: 5px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #d946ef, #a855f7);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+  animation: miniWave 1.2s infinite ease-in-out;
+}
+
+@keyframes miniWave {
+  0% { height: 4px; opacity: 0.6; }
+  20% { height: 13px; opacity: 1; }
+  40% { height: 7px; }
+  60% { height: 17px; }
+  80% { height: 9px; }
+  100% { height: 4px; opacity: 0.6; }
+}
+
+@media (max-width: 720px) {
+  .appShell {
+    min-height: 100dvh;
+    padding-bottom: 112px;
+  }
+
+  .main {
+    max-width: none;
+    min-height: calc(100dvh - 92px);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mobileTabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    order: -1;
+  }
+
+  .mobileTabButton {
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    background: linear-gradient(
+      145deg,
+      rgba(139, 92, 246, 0.22),
+      rgba(139, 92, 246, 0.07)
+    );
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .mobileTabButtonActive {
+    color: white;
+    background-color: #271925;
+    box-shadow:
+      inset 0 1px 2px rgba(255, 255, 255, 0.15),
+      0 4px 12px rgba(139, 92, 246, 0.25);
+  }
+
+  .leftCol,
+  .rightCol {
+    flex: 1;
+    min-height: 0;
+    padding: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .mobilePanelHidden {
+    display: none;
+  }
+
+  .mobilePanelActive {
+    display: flex;
+  }
+
+  .sectionTitle {
+    display: none;
+  }
+
+  .miniPlayer {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 30;
+    display: block;
+    padding: 12px;
+    border-radius: 12px;
+    background-color: #271925;
+    background-image: linear-gradient(
+      120deg,
+      rgba(88, 63, 135, 0.42) 0%,
+      rgba(67, 56, 202, 0.28) 44%,
+      rgba(30, 41, 99, 0.38) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 14px 36px rgba(0, 0, 0, 0.52),
+      inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(18px);
+  }
+}
+
+@media (max-width: 390px) {
+  .miniPlayerControls {
+    gap: 6px;
+  }
+
+  .miniPlayerButton {
+    min-width: 48px;
+    padding: 0 10px;
+  }
+}
+
 .dragOverlayCard {
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 54px 92px;
   align-items: center;
-  gap: 5px;
-  width: 520px;
-  height: 75px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  gap: 16px;
+  width: min(92vw, 640px);
+  max-width: calc(100vw - 48px);
+  height: 80px;
+  box-sizing: border-box;
   cursor: grab;
   padding: 12px 14px;
   border-radius: 18px;
@@ -97,6 +296,11 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
+  object-fit: cover;
+}
+
+.overlayInfo {
+  min-width: 0;
 }
 
 .overlayTitle {
@@ -104,10 +308,69 @@
   font-size: 15px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .overlayArtist {
   margin: 0;
   font-size: 12px;
   color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overlayDuration {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.overlayAddButton {
+  height: 38px;
+  min-width: 92px;
+  padding: 6px 14px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: linear-gradient(
+    145deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(139, 92, 246, 0.08)
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+@media (max-width: 720px) {
+  .dragOverlayCard {
+    grid-template-columns: 46px minmax(0, 1fr) 66px;
+    gap: 10px;
+    width: calc(100vw - 28px);
+    height: 74px;
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .overlayImage {
+    width: 46px;
+    height: 46px;
+  }
+
+  .overlayDuration {
+    display: none;
+  }
+
+  .overlayAddButton {
+    min-width: 66px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+  }
 }
