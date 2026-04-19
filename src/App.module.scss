@@ -164,7 +164,7 @@
   100% { height: 4px; opacity: 0.6; }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 980px) {
   .appShell {
     min-height: 100dvh;
     padding-bottom: 112px;
@@ -348,7 +348,7 @@
     0 4px 12px rgba(139, 92, 246, 0.25);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 980px) {
   .dragOverlayCard {
     grid-template-columns: 46px minmax(0, 1fr) 66px;
     gap: 10px;

@@ -75,3 +75,14 @@
 .button:active {
   transform: translateY(0);
 }
+
+@media (max-width: 980px) {
+  .searchBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
