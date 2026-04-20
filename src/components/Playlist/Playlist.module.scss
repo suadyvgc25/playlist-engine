@@ -453,7 +453,7 @@
   .playlistWrapper,
   .playlist {
     min-height: 0;
-    height: 100%;
+    height: auto;
   }
 
   .playlist {
@@ -481,13 +481,11 @@
   }
 
   .trackList {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    flex: none;
+    min-height: auto;
+    overflow: visible;
     padding-right: 2px;
     padding-bottom: 8px;
-    -webkit-overflow-scrolling: touch;
   }
 
   .trackItem {

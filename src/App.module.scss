@@ -172,11 +172,14 @@
 
   .main {
     max-width: none;
-    min-height: calc(100dvh - 92px);
+    height: calc(100dvh - 184px);
+    min-height: 0;
     padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .mobileTabs {
@@ -211,11 +214,14 @@
 
   .leftCol,
   .rightCol {
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
+    max-height: 100%;
     padding: 16px;
     border-radius: 12px;
-    overflow: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .mobilePanelHidden {
@@ -224,6 +230,7 @@
 
   .mobilePanelActive {
     display: flex;
+    min-height: 0;
   }
 
   .sectionTitle {

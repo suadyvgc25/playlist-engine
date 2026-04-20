@@ -8,7 +8,15 @@ import { logout, getStoredTokens } from "../services/spotify/auth";
 import { savePlaylistToSpotify } from "../services/spotify/savePlaylist";
 import { fetchPreviewFromiTunes } from "../services/spotify/search";
 
-import { DndContext, DragEndEvent, DragOverlay, closestCorners } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  PointerSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { formatDuration } from "../utils/formatDuration"; 
 import SortableTrackItem from "../components/Playlist/SortableTrackItem";
@@ -72,6 +80,13 @@ export default function HomePage() {
   const hoverTrackIdRef = useRef<string | null>(null);
   const playbackSourceRef = useRef<PlaybackSource>("search");
   const playbackIndexRef = useRef(-1);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
 
   if (!audioRef.current) {
     audioRef.current = new Audio();
@@ -484,7 +499,8 @@ export default function HomePage() {
 
   return (
 
-    <DndContext 
+    <DndContext
+      sensors={sensors}
       collisionDetection={closestCorners} 
       onDragStart={handleDragStart} 
       onDragEnd={handleDragEnd}
