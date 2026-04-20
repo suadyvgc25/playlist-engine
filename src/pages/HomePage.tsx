@@ -190,7 +190,7 @@ export default function HomePage() {
 
       const playlist = await savePlaylistToSpotify(playlistName, playlistTracks);
       console.log("Open playlist here:", playlist.external_urls?.spotify);
-      setSaveSuccess(`Playlist saved: ${playlist.name}`);
+      setSaveSuccess(`Playlist Saved: ${playlist.name}`);
 
     } catch (e: any) {
       setSaveError(e?.message ?? "Failed to save playlist");
@@ -582,7 +582,7 @@ export default function HomePage() {
           >
             <h2 className={styles.sectionTitle}>Playlist Builder</h2>
 
-            {saveSuccess && <p style={{ color: "green" }}>{saveSuccess}</p>}
+            {saveSuccess && <p className={styles.saveSuccessMessage}>{saveSuccess}</p>}
             {saveError && <p style={{ color: "red" }}>{saveError}</p>}
 
             <Playlist
@@ -604,7 +604,10 @@ export default function HomePage() {
         </main>
 
         {currentTrack && (
-          <aside className={styles.miniPlayer} aria-label="Now playing">
+          <aside
+            className={`${styles.miniPlayer} ${isPlaying ? styles.miniPlayerPlaying : ""}`}
+            aria-label="Now playing"
+          >
             <div className={styles.miniPlayerTop}>
               <img
                 src={currentTrack.imageUrl}
@@ -636,7 +639,7 @@ export default function HomePage() {
             </div>
             {isPlaying && (
               <div className={styles.miniWaveform} aria-hidden="true">
-                {Array.from({ length: 56 }).map((_, i) => (
+                {Array.from({ length: 180 }).map((_, i) => (
                   <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
                 ))}
               </div>

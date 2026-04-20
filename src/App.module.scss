@@ -50,6 +50,15 @@
   color: white;
 }
 
+.saveSuccessMessage {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #f0abfc;
+  text-shadow: 0 0 14px rgba(216, 180, 254, 0.55);
+}
+
 /* Subtle inner sheen */
 .leftCol::before,
 .rightCol::before {
@@ -72,6 +81,10 @@
 
 .miniPlayer {
   display: none;
+}
+
+.miniPlayerPlaying {
+  overflow: hidden;
 }
 
 .miniPlayerTop {
@@ -141,12 +154,15 @@
   display: flex;
   align-items: flex-end;
   gap: 2px;
-  height: 18px;
-  margin-top: 10px;
+  width: auto;
+  height: 24px;
+  margin: 10px -12px 0;
+  padding: 0 12px;
   overflow: hidden;
 }
 
 .miniWaveform span {
+  flex: 0 0 2px;
   width: 2px;
   height: 5px;
   border-radius: 2px;
@@ -258,6 +274,10 @@
       0 14px 36px rgba(0, 0, 0, 0.52),
       inset 0 1px 1px rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(18px);
+  }
+
+  .miniPlayerPlaying {
+    padding-bottom: 0;
   }
 }
 
