@@ -463,11 +463,14 @@
   .headerRow {
     flex-direction: column;
     align-items: stretch;
+    justify-content: center;
     gap: 10px;
+    min-height: 48px;
   }
 
   .titleInput {
-    height: 46px;
+    height: 100%;
+    min-height: 48px;
     border-radius: 12px;
     padding: 0 14px;
   }
