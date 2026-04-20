@@ -322,12 +322,21 @@
   }
 
   .headerRow {
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
   }
 
   .headerRow h2 {
+    margin: 0;
     font-size: 17px;
+    line-height: 1;
+  }
+
+  .count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    line-height: 1;
   }
 
   .trackList {
