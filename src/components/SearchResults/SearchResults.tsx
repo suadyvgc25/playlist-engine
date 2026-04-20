@@ -28,6 +28,10 @@ export default function SearchResults({
   isHoverPreview,
   tracksWithoutPreviews,
 }: Props) {
+  if (tracks.length === 0) {
+    return null;
+  }
+
   return (
     <div className={styles.results}>
       <div className={styles.headerRow}>
