@@ -494,14 +494,19 @@
   }
 
   .trackItemInner {
-    grid-template-columns: 18px 48px minmax(0, 1fr) auto;
+    grid-template-columns: 48px minmax(0, 1fr) auto;
     gap: 10px;
     height: 74px;
     padding-right: 92px;
+    cursor: grab;
   }
 
   .dragHandle {
-    padding-left: 6px;
+    display: none;
+  }
+
+  .trackItemInner:active {
+    cursor: grabbing;
   }
 
   .albumWrapper {

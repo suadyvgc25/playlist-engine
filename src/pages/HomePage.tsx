@@ -12,7 +12,8 @@ import {
   DndContext,
   DragEndEvent,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCorners,
   useSensor,
   useSensors,
@@ -81,9 +82,15 @@ export default function HomePage() {
   const playbackSourceRef = useRef<PlaybackSource>("search");
   const playbackIndexRef = useRef(-1);
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: {
         distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 180,
+        tolerance: 8,
       },
     })
   );

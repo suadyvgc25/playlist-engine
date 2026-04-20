@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styles from "./Playlist.module.scss";
@@ -15,6 +16,9 @@ type Props = {
 
 export default function SortableTrackItem({ track, onRemove, showDragHandle = true,onPlay,currentTrack,isPlaying, previewUnavailable = false, }: Props) {
   const isOverlay = !onRemove;
+  const [isMobileLayout, setIsMobileLayout] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 980px)").matches
+  );
 
   const {
     attributes,
@@ -33,6 +37,20 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
 
   const isActive = currentTrack?.id === track.id;
   const isActivePlaying = !previewUnavailable && currentTrack?.id === track.id && isPlaying;
+  const mobileDragListeners = !isOverlay && isMobileLayout ? listeners : {};
+  const handleDragListeners = !isOverlay && !isMobileLayout ? listeners : {};
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 980px)");
+    const syncMobileLayout = () => setIsMobileLayout(mediaQuery.matches);
+
+    syncMobileLayout();
+    mediaQuery.addEventListener("change", syncMobileLayout);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncMobileLayout);
+    };
+  }, []);
 
   const handlePlay = () => {
     if (previewUnavailable) return;
@@ -53,11 +71,12 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
     >
       <div
+        {...mobileDragListeners}
         className={`${styles.trackItemInner} ${previewUnavailable ? styles.noPreview : ""}`}
       >
 
-        {showDragHandle && (
-          <div {...(isOverlay ? {} : listeners)} className={styles.dragHandle}>
+        {showDragHandle && !isMobileLayout && (
+          <div {...handleDragListeners} className={styles.dragHandle}>
             ⠿
           </div>
         )}
@@ -83,6 +102,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
                 ? `Pause ${track.name}`
                 : `Play ${track.name}`
             }
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               handlePlay();
@@ -117,6 +137,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           <div className={styles.buttonSlot}>
             {onRemove && (
               <button
+                onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemove(track.id);
