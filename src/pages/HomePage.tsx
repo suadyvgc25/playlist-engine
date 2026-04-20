@@ -611,11 +611,13 @@ export default function HomePage() {
                 </button>
               </div>
             </div>
-            <div className={styles.miniWaveform} aria-hidden="true">
-              {Array.from({ length: 56 }).map((_, i) => (
-                <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
-              ))}
-            </div>
+            {isPlaying && (
+              <div className={styles.miniWaveform} aria-hidden="true">
+                {Array.from({ length: 56 }).map((_, i) => (
+                  <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
+                ))}
+              </div>
+            )}
           </aside>
         )}
       </div>

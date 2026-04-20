@@ -64,10 +64,6 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
 
         <div
           className={styles.albumWrapper}
-          onClick={(e) => {
-            e.stopPropagation();
-            handlePlay();
-          }}
           aria-disabled={previewUnavailable}
         >
           <img
