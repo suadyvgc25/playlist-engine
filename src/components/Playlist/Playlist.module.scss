@@ -489,14 +489,17 @@
   }
 
   .trackItem {
+    min-height: 74px;
+    height: 74px;
+    padding: 10px 12px;
     border-radius: 12px;
     touch-action: pan-y;
   }
 
   .trackItemInner {
-    grid-template-columns: 48px minmax(0, 1fr) auto;
+    grid-template-columns: 46px minmax(0, 1fr) auto;
     gap: 10px;
-    height: 74px;
+    height: 100%;
     padding-right: 92px;
     cursor: grab;
   }
