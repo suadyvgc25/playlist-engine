@@ -18,11 +18,11 @@ export default function Header({
       <div className={styles.authStatus}>
         {isLoggedIn ? (
           <>
-            <span>Logged in as {userName ?? "Spotify User"}</span>
+            <span className={styles.userLabel}>Logged in as {userName ?? "Spotify User"}</span>
             <button type="button" onClick={onLogout}>Log Out</button>
           </>
         ) : (
-          <span>Logged out</span>
+          <span className={styles.userLabel}>Logged out</span>
         )}
       </div>
     </header>

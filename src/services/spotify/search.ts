@@ -8,6 +8,17 @@ type SpotifySearchResponse = {
   };
 };
 
+type ITunesSearchResult = {
+  kind?: string;
+  trackName?: string;
+  artistName?: string;
+  previewUrl?: string;
+};
+
+type ITunesSearchResponse = {
+  results?: ITunesSearchResult[];
+};
+
 export async function searchTracks(query: string): Promise<Track[]> {
   const q = query.trim();
   if (!q) return [];
@@ -27,26 +38,10 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
   const query = `${track.name} ${track.artist}`;
 
   try {
-    const params = new URLSearchParams({
-      term: query,
-      limit: "5",
-      media: "music",
-      entity: "song",
-      country: "US",
-    });
-
-    const res = await fetch(`https://itunes.apple.com/search?${params.toString()}`);
-
-    if (!res.ok) {
-      return undefined;
-    }
-
-    const data = await res.json();
-
-    const results = data.results || [];
+    const results = await loadITunesResults(query);
     console.log("iTunes results:", results);
     // 🎯 Find best match
-    const match = results.find((item: any) => {
+    const match = results.find((item) => {
       const isMusic = item.kind === "song";
 
       const nameMatch = item.trackName?.toLowerCase().includes(track.name.toLowerCase());
@@ -60,4 +55,19 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
     console.warn("Failed to fetch iTunes preview", err);
     return undefined;
   }
+}
+
+function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {
+  const params = new URLSearchParams({
+    term: query,
+    limit: "5",
+    media: "music",
+    entity: "song",
+    country: "US",
+  });
+
+  return fetch(`/api/itunes/search?${params.toString()}`)
+    .then((res) => (res.ok ? res.json() : { results: [] }))
+    .then((data: ITunesSearchResponse) => data.results ?? [])
+    .catch(() => []);
 }
