@@ -513,7 +513,7 @@ export default function HomePage() {
       onDragEnd={handleDragEnd}
     >
 
-      <div className={styles.appShell}>
+      <div className={`${styles.appShell} ${currentTrack ? styles.hasMiniPlayer : ""}`}>
 
         <Header 
           isLoggedIn={isLoggedIn} 
