@@ -25,24 +25,39 @@ export async function searchTracks(query: string): Promise<Track[]> {
 
 export async function fetchPreviewFromiTunes(track: Track): Promise<string | undefined> {
   const query = `${track.name} ${track.artist}`;
-  
-  const res = await fetch(
-    `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&limit=5&media=music&entity=song`
-  );
 
-  const data = await res.json();
+  try {
+    const params = new URLSearchParams({
+      term: query,
+      limit: "5",
+      media: "music",
+      entity: "song",
+      country: "US",
+    });
 
-  const results = data.results || [];
-  console.log("iTunes results:", results);
-  // 🎯 Find best match
-  const match = results.find((item: any) => {
-  const isMusic = item.kind === "song";
+    const res = await fetch(`https://itunes.apple.com/search?${params.toString()}`);
 
-  const nameMatch = item.trackName?.toLowerCase().includes(track.name.toLowerCase());
-  const artistMatch = item.artistName?.toLowerCase().includes(track.artist.split(",")[0].toLowerCase());
+    if (!res.ok) {
+      return undefined;
+    }
 
-  return isMusic && nameMatch && artistMatch && item.previewUrl;
-});
+    const data = await res.json();
 
-  return match?.previewUrl ?? undefined;
+    const results = data.results || [];
+    console.log("iTunes results:", results);
+    // 🎯 Find best match
+    const match = results.find((item: any) => {
+      const isMusic = item.kind === "song";
+
+      const nameMatch = item.trackName?.toLowerCase().includes(track.name.toLowerCase());
+      const artistMatch = item.artistName?.toLowerCase().includes(track.artist.split(",")[0].toLowerCase());
+
+      return isMusic && nameMatch && artistMatch && item.previewUrl;
+    });
+
+    return match?.previewUrl ?? undefined;
+  } catch (err) {
+    console.warn("Failed to fetch iTunes preview", err);
+    return undefined;
+  }
 }

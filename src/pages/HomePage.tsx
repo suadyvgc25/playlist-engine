@@ -23,6 +23,14 @@ import Playlist from "../components/Playlist/Playlist";
 import styles from "../App.module.scss";
 
 const DRAG_THRESHOLD = 5;
+type PlaybackSource = "search" | "playlist";
+
+type PlayTrackOptions = {
+  preview?: boolean;
+  toggle?: boolean;
+  source?: PlaybackSource;
+  queueIndex?: number;
+};
 
 export default function HomePage() {
   const tokens = getStoredTokens();
@@ -62,6 +70,8 @@ export default function HomePage() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const hoverTrackIdRef = useRef<string | null>(null);
+  const playbackSourceRef = useRef<PlaybackSource>("search");
+  const playbackIndexRef = useRef(-1);
 
   if (!audioRef.current) {
     audioRef.current = new Audio();
@@ -292,7 +302,12 @@ export default function HomePage() {
     setActiveOverlaySize(null);
   }
 
-  async function playTrack(track: Track, { preview = false, toggle = false } = {}) {
+  async function playTrack(track: Track, {
+    preview = false,
+    toggle = false,
+    source,
+    queueIndex,
+  }: PlayTrackOptions = {}) {
     console.log("TRACK CLICKED:", track);
     // HANDLE MODE CLEANLY (THIS FIXES EVERYTHING)
     if (preview) {
@@ -302,7 +317,7 @@ export default function HomePage() {
       hoverTrackIdRef.current = null;
     }
 
-    if (!audioRef.current) return;
+    if (!audioRef.current) return false;
     const audio = audioRef.current;
 
     const isSameTrack = currentTrack?.id === track.id;
@@ -312,7 +327,7 @@ export default function HomePage() {
       if (!track.previewUrl && !audio.currentSrc) {
         clearAudio(audio);
         setCurrentTrack(track);
-        return;
+        return false;
       }
 
       if (isPlaying) {
@@ -322,7 +337,7 @@ export default function HomePage() {
         audio.play().catch(console.error);
         setIsPlaying(true);
       }
-      return; // prevents restart bug
+      return true; // prevents restart bug
     }
 
     // Track hover session
@@ -336,11 +351,16 @@ export default function HomePage() {
 
     // If Spotify doesn't have it → fetch from iTunes
     if (!previewUrl) {
-      previewUrl = await fetchPreviewFromiTunes(track);
+      try {
+        previewUrl = await fetchPreviewFromiTunes(track);
+      } catch (err) {
+        console.warn("Preview lookup failed", err);
+        previewUrl = undefined;
+      }
         // Cancel if hover changed
       if (preview && hoverTrackIdRef.current !== track.id) {
         console.log("Hover cancelled, not playing");
-        return;
+        return false;
       }
     }
 
@@ -352,7 +372,7 @@ export default function HomePage() {
         clearAudio(audio);
         setTracksWithoutPreviews((prev) => new Set(prev).add(track.id));
       }
-      return;
+      return false;
     }
 
     // Stop previous audio before playing new
@@ -367,6 +387,18 @@ export default function HomePage() {
       ...track,
       previewUrl
     });
+    if (!preview) {
+      const nextSource =
+        source ?? (playlistTracks.some((playlistTrack) => playlistTrack.id === track.id) ? "playlist" : "search");
+      const nextQueue = nextSource === "playlist" ? playlistTracks : results;
+      const nextIndex =
+        typeof queueIndex === "number"
+          ? queueIndex
+          : nextQueue.findIndex((queueTrack) => queueTrack.id === track.id);
+
+      playbackSourceRef.current = nextSource;
+      playbackIndexRef.current = nextIndex;
+    }
     setTracksWithoutPreviews((prev) => {
       const next = new Set(prev);
       next.delete(track.id);
@@ -394,6 +426,8 @@ export default function HomePage() {
       // STEP 3 — CLEAR HOVER SESSION
       hoverTrackIdRef.current = null; // Lock overrides hover
     }
+
+    return true;
   }
 
   function stopPreview() {
@@ -422,20 +456,29 @@ export default function HomePage() {
     audio.currentTime = time;
   }
 
-  function playNextTrack() {
-    const playbackQueue = currentTrack && playlistTracks.some((track) => track.id === currentTrack.id)
-      ? playlistTracks
-      : results;
+  async function playNextTrack() {
+    const playbackSource = playbackSourceRef.current;
+    const playbackQueue = playbackSource === "playlist" ? playlistTracks : results;
 
     if (playbackQueue.length === 0) return;
 
-    const currentIndex = currentTrack
+    const currentIndex = playbackIndexRef.current >= 0
+      ? playbackIndexRef.current
+      : currentTrack
       ? playbackQueue.findIndex((track) => track.id === currentTrack.id)
       : -1;
-    const nextTrack = playbackQueue[(currentIndex + 1) % playbackQueue.length];
 
-    if (nextTrack) {
-      playTrack(nextTrack, { preview: false });
+    for (let offset = 1; offset <= playbackQueue.length; offset += 1) {
+      const nextIndex = (currentIndex + offset) % playbackQueue.length;
+      const nextTrack = playbackQueue[nextIndex];
+      const didPlay = await playTrack(nextTrack, {
+        preview: false,
+        source: playbackSource,
+        queueIndex: nextIndex,
+      });
+      if (didPlay) {
+        return;
+      }
     }
   }
 
@@ -498,7 +541,7 @@ export default function HomePage() {
                   loading={loading}
                   error={error}
                   query={query}
-                  onPlay={playTrack}
+                  onPlay={(track, opts) => playTrack(track, { ...opts, source: "search" })}
                   currentTrack={currentTrack}
                   isPlaying={isPlaying}
                   stopPreview={stopPreview}
@@ -528,7 +571,7 @@ export default function HomePage() {
               onSave={handleSavePlaylist}
               playlistCount={playlistCount}
               saving={saving}
-              onPlay={playTrack}
+              onPlay={(track, opts) => playTrack(track, { ...opts, source: "playlist" })}
               currentTrack={currentTrack}
               isPlaying={isPlaying}
               tracksWithoutPreviews={tracksWithoutPreviews}
