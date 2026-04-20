@@ -54,7 +54,7 @@ export default function SearchResultTrackItem({
       data-search-track-id={track.id}
       {...attributes}
       {...listeners}
-      className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
+      className={`${styles.trackItem} ${isActive ? styles.active : ""} ${isCurrentPlaying ? styles.previewing : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
       onMouseEnter={() => {
@@ -106,28 +106,22 @@ export default function SearchResultTrackItem({
           <p className={styles.trackName}>{track.name}</p>
           <p className={styles.artistName}>{track.artist}</p>
         </div>
-      </div>
 
-      <div
-        className={styles.waveform}
-        style={{
-          opacity: isCurrentPlaying ? 1 : 0,
-          width: "180px",
-        }}
-      >
-        {Array.from({ length: 60 }).map((_, i) => (
-          <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
-        ))}
+        <div className={styles.waveform}>
+          {Array.from({ length: 160 }).map((_, i) => (
+            <span key={i} style={{ animationDelay: `${i * 0.05}s` }} />
+          ))}
+        </div>
       </div>
 
       <div className={styles.trackActions}>
-        <div className={styles.playerSlot}>
-          {!isCurrentPlaying && (
+        {!isCurrentPlaying && (
+          <div className={styles.playerSlot}>
             <span className={styles.trackDuration}>
               {formatDuration(track.duration)}
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         <button
           className={styles.addButton}
