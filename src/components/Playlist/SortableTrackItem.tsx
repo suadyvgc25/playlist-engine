@@ -53,7 +53,6 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
     >
       <div
-        onClick={handlePlay}
         className={`${styles.trackItemInner} ${previewUnavailable ? styles.noPreview : ""}`}
       >
 
@@ -77,9 +76,24 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
             className={styles.albumImage}
           />
 
-          <div className={styles.overlay}>
+          <button
+            type="button"
+            className={styles.overlay}
+            disabled={previewUnavailable}
+            aria-label={
+              previewUnavailable
+                ? `No preview available for ${track.name}`
+                : currentTrack?.id === track.id && isPlaying
+                ? `Pause ${track.name}`
+                : `Play ${track.name}`
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              handlePlay();
+            }}
+          >
             {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
-          </div>
+          </button>
         </div>
 
         <div className={styles.trackInfo}>
@@ -107,7 +121,10 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           <div className={styles.buttonSlot}>
             {onRemove && (
               <button
-                onClick={() => onRemove(track.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove(track.id);
+                }}
                 className={styles.removeButton}
               >
                 Remove
