@@ -3,10 +3,13 @@
   inset: -250px;
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, 190px);
-  grid-auto-rows: 190px;
+  --tile-size: 190px;
+  --tile-gap: 20px;
 
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, var(--tile-size));
+  grid-auto-rows: var(--tile-size);
+
+  gap: var(--tile-gap);
   padding: 80px;
 
   z-index: 1;
@@ -34,4 +37,30 @@
   border-radius: 14px;
   filter: saturate(1.2);
   transform: scale(1.05);
+}
+
+@media (max-width: 700px) {
+  .grid {
+    --tile-size: 118px;
+    --tile-gap: 12px;
+
+    inset: -160px;
+    padding: 56px;
+    filter: blur(3px);
+    animation-name: driftMobile;
+  }
+
+  .grid img {
+    border-radius: 10px;
+  }
+}
+
+@keyframes driftMobile {
+  from {
+    transform: perspective(900px) rotateX(10deg) rotateZ(6deg) scale(1.35) translate(0, 0);
+  }
+
+  to {
+    transform: perspective(900px) rotateX(10deg) rotateZ(6deg) scale(1.35) translate(-70px, -190px);
+  }
 }
