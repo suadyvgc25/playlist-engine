@@ -32,7 +32,16 @@ export async function searchTracks(query: string): Promise<Track[]> {
 
   const data = await spotifyFetch<SpotifySearchResponse>(`/search?${params.toString()}`);
   const items = data.tracks?.items ?? [];
-  return items.map(mapSpotifyTrackToTrack);
+  const tracks = items.map(mapSpotifyTrackToTrack);
+
+  return Promise.all(
+    tracks.map(async (track) => {
+      if (track.previewUrl) return track;
+
+      const previewUrl = await fetchPreviewFromiTunes(track);
+      return previewUrl ? { ...track, previewUrl } : track;
+    })
+  );
 }
 
 export async function fetchPreviewFromiTunes(track: Track): Promise<string | undefined> {
@@ -41,20 +50,37 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
   try {
     const results = await loadITunesResults(query);
     // Spotify tracks can map to broad iTunes results; use the title and lead artist to avoid unrelated previews.
+    const trackName = normalizeSearchText(track.name);
+    const leadArtist = normalizeSearchText(track.artist.split(",")[0]);
+
     const match = results.find((item) => {
       const isMusic = item.kind === "song";
+      const resultName = normalizeSearchText(item.trackName ?? "");
+      const resultArtist = normalizeSearchText(item.artistName ?? "");
 
-      const nameMatch = item.trackName?.toLowerCase().includes(track.name.toLowerCase());
-      const artistMatch = item.artistName?.toLowerCase().includes(track.artist.split(",")[0].toLowerCase());
+      const nameMatch =
+        resultName.includes(trackName) ||
+        trackName.includes(resultName);
+      const artistMatch =
+        resultArtist.includes(leadArtist) ||
+        leadArtist.includes(resultArtist);
 
       return isMusic && nameMatch && artistMatch && item.previewUrl;
     });
 
-    return match?.previewUrl ?? undefined;
+    return match?.previewUrl ?? results.find((item) => item.kind === "song" && item.previewUrl)?.previewUrl;
   } catch (err) {
     console.warn("Failed to fetch iTunes preview", err);
     return undefined;
   }
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\([^)]*\)|\[[^\]]*\]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {

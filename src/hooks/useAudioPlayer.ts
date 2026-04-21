@@ -102,8 +102,14 @@ export function useAudioPlayer({
         audio.pause();
         setIsPlaying(false);
       } else {
-        audio.play().catch(console.error);
-        setIsPlaying(true);
+        try {
+          await audio.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.warn("Preview playback failed", err);
+          setIsPlaying(false);
+          return false;
+        }
       }
       return true;
     }
@@ -142,7 +148,13 @@ export function useAudioPlayer({
     audio.pause();
     audio.src = previewUrl;
     audio.currentTime = 0;
-    audio.play().catch(console.error);
+    try {
+      await audio.play();
+    } catch (err) {
+      console.warn("Preview playback failed", err);
+      setIsPlaying(false);
+      return false;
+    }
 
     setCurrentTrack({
       ...track,
