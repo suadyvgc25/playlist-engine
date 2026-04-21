@@ -82,7 +82,6 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       className={`${styles.trackItem} ${isActive ? styles.active : ""}`}
     >
       <div
-        {...mobileDragListeners}
         className={`${styles.trackItemInner} ${previewUnavailable ? styles.noPreview : ""}`}
       >
 
@@ -139,7 +138,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           </button>
         </div>
 
-        <div className={styles.trackInfo}>
+        <div className={styles.trackInfo} {...mobileDragListeners}>
           <p className={styles.trackName}>{track.name}</p>
           <p className={styles.artistName}>{track.artist}</p>
         </div>

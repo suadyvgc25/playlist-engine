@@ -32,6 +32,8 @@ export default function SearchResultTrackItem({
   });
 
   const isHoverDevice = window.matchMedia("(hover: hover)").matches;
+  const rowDragListeners = isHoverDevice ? listeners : {};
+  const touchDragListeners = isHoverDevice ? {} : listeners;
 
   const isCurrentPlaying =
     currentTrack?.id === track.id &&
@@ -65,7 +67,7 @@ export default function SearchResultTrackItem({
       ref={setNodeRef}
       data-search-track-id={track.id}
       {...attributes}
-      {...listeners}
+      {...rowDragListeners}
       className={`${styles.trackItem} ${isActive ? styles.active : ""} ${showTrackWaveform ? styles.previewing : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
@@ -130,7 +132,7 @@ export default function SearchResultTrackItem({
           </div>
         </div>
 
-        <div className={styles.trackInfo}>
+        <div className={styles.trackInfo} {...touchDragListeners}>
           <p className={styles.trackName}>{track.name}</p>
           <p className={styles.artistName}>{track.artist}</p>
         </div>
