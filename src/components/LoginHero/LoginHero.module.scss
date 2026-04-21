@@ -126,8 +126,13 @@
 .features li {
   display: flex;
   align-items: center;
-  width: 220px;
+  width: max-content;
+  max-width: 100%;
   font-weight: 500;
+}
+
+.features span:last-child {
+  white-space: nowrap;
 }
 
 .check {

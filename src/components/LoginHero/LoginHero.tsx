@@ -33,17 +33,17 @@ export default function LoginHero() {
             <ul className={styles.features}>
               <li>
                 <span className={styles.check}>✓</span>
-                <span>Album artwork preview</span>
+                <span>Search Spotify tracks instantly</span>
               </li>
 
               <li>
                 <span className={styles.check}>✓</span>
-                <span>Live playlist duration</span>
+                <span>Preview songs and arrange the flow</span>
               </li>
 
               <li>
                 <span className={styles.check}>✓</span>
-                <span>Save directly to Spotify</span>
+                <span>Save finished playlists to Spotify</span>
               </li>
             </ul>
          </div>
