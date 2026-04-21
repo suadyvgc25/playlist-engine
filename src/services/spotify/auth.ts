@@ -128,7 +128,7 @@ export async function finishSpotifyLogin(search: string) {
     scope: data.scope,
   });
 
-  // clean one-time values
+  // PKCE values should only be valid for this login attempt.
   storage.removeItem(VERIFIER_KEY);
   storage.removeItem(STATE_KEY);
 }

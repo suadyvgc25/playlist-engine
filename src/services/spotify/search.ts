@@ -39,7 +39,7 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
 
   try {
     const results = await loadITunesResults(query);
-    // 🎯 Find best match
+    // iTunes returns broad matches, so prefer the same song and primary artist.
     const match = results.find((item) => {
       const isMusic = item.kind === "song";
 

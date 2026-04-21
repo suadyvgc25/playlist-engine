@@ -99,7 +99,7 @@ export default function AlbumMosaic() {
 
     const picked =
       shuffled.find((album) => {
-        // Check ALL neighbors within radius
+        // Keep repeated covers from clustering too closely in the mosaic.
         for (let r = -radius; r <= radius; r++) {
           for (let c = -radius; c <= radius; c++) {
             if (r === 0 && c === 0) continue;
@@ -112,14 +112,14 @@ export default function AlbumMosaic() {
             const index = checkRow * cols + checkCol;
 
             if (grid[index] === album) {
-              return false; //  Found duplicate in radius
+              return false;
             }
           }
         }
 
-        return true; // Safe
+        return true;
       }) 
-      // Fallback if impossible
+      // Fall back when every shuffled option is already nearby.
       || shuffled[0];
 
     grid.push(picked);

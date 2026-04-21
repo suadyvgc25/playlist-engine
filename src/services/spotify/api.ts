@@ -29,7 +29,7 @@ export async function spotifyFetch<T>(
     },
   });
 
-  // Handle rate limit 429)
+  // Surface Spotify rate limits with the retry window when it is provided.
   if (res.status === 429) {
     const retryAfter = res.headers.get("Retry-After");
     throw new SpotifyApiError(
@@ -47,7 +47,7 @@ export async function spotifyFetch<T>(
   }
 
   if (!res.ok) {
-    // 401 means token invalid/expired
+    // A 401 usually means the stored access token can no longer be used.
     const message =
       res.status === 401
         ? "Unauthorized (token expired). Please log in again."

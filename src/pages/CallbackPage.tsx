@@ -6,7 +6,7 @@ export default function CallbackPage() {
   const [status, setStatus] = useState("Finishing Spotify login...");
   const navigate = useNavigate();
 
-  // prevents double execution in React Strict Mode
+  // React Strict Mode can run effects twice during development.
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function CallbackPage() {
       try {
         await finishSpotifyLogin(window.location.search);
 
-        // remove ?code and ?state from URL
+        // Drop the temporary OAuth params before returning to the app.
         window.history.replaceState({}, document.title, "/");
 
         setStatus("Success! Redirecting...");
