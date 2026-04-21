@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fetchITunesJson } from './api/itunes/search.js'
 
 function iTunesPreviewProxy() {
   return {
@@ -23,40 +24,6 @@ function iTunesPreviewProxy() {
       })
     },
   }
-}
-
-async function fetchITunesJson(url, redirectCount = 0) {
-  if (redirectCount > 3) {
-    return { results: [] }
-  }
-
-  const response = await fetch(url, {
-    redirect: 'manual',
-    headers: {
-      Accept: 'application/json',
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
-    },
-  })
-
-  if (response.status >= 300 && response.status < 400) {
-    const location = response.headers.get('location')
-    if (!location) {
-      return { results: [] }
-    }
-
-    const nextUrl = location.startsWith('musics://')
-      ? `https://${location.slice('musics://'.length)}`
-      : new URL(location, url).toString()
-
-    return fetchITunesJson(nextUrl, redirectCount + 1)
-  }
-
-  if (!response.ok) {
-    return { results: [] }
-  }
-
-  return response.json()
 }
 
 export default defineConfig({

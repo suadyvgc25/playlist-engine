@@ -116,9 +116,11 @@ Builds and deploys the `dist` folder with `gh-pages`.
 
 Spotify search results do not always include playable preview URLs. To support previews, the app searches iTunes for a matching song and uses the returned preview URL when available.
 
-During local development, `vite.config.js` includes a small `/api/itunes/search` proxy. This avoids browser redirect and CORS issues from direct iTunes requests.
+During local development, `vite.config.js` mounts `/api/itunes/search` so previews behave like they do in production.
 
-If the app is deployed to a static host, make sure the deployed environment also supports the `/api/itunes/search` endpoint or replace it with a production-ready API route. Without that proxy, previews may fail even though Spotify search still works.
+For production, `api/itunes/search.js` provides the same endpoint as a Vercel serverless function. This avoids browser redirect and CORS issues from direct iTunes requests.
+
+GitHub Pages is a static host, so it cannot run this API route. If you deploy with `gh-pages`, Spotify search can still work, but iTunes previews may fail. For full preview support, deploy to Vercel or another host that can run `/api/itunes/search`.
 
 ## Project Structure
 
@@ -140,7 +142,8 @@ src/
 - `src/hooks/usePlaylist.ts` handles playlist state and saving to Spotify.
 - `src/services/spotify/auth.ts` handles Spotify login, token storage, refresh, and logout.
 - `src/services/spotify/search.ts` handles Spotify search and iTunes preview lookup.
-- `vite.config.js` configures React and the local iTunes preview proxy.
+- `api/itunes/search.js` provides the production iTunes preview proxy.
+- `vite.config.js` configures React and mounts the local iTunes preview proxy during development.
 
 ## Production Checklist
 
@@ -156,6 +159,5 @@ Also confirm:
 
 - Spotify redirect URI matches the production URL.
 - Required Spotify scopes are configured.
-- The iTunes preview proxy or equivalent production endpoint is available.
+- The iTunes preview proxy is available in the production hosting environment.
 - Mobile and desktop playback controls still work after deployment.
-
