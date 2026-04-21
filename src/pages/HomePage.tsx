@@ -5,6 +5,7 @@ import type { SpotifyCurrentUser } from "../services/spotify/users";
 import { getCurrentUserProfile } from "../services/spotify/users";
 import { searchTracks } from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
+import { SpotifyApiError } from "../services/spotify/api";
 
 import {
   DndContext,
@@ -34,20 +35,40 @@ import type { PlaybackSource } from "../hooks/useAudioPlayer";
 import styles from "../App.module.scss";
 
 const DRAG_THRESHOLD = 5;
+const USER_NAME_KEY = "spotify_profile_name";
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+function getProfileName(user: SpotifyCurrentUser | null) {
+  return user?.display_name?.trim() || user?.email?.trim() || user?.id?.trim() || "";
+}
+
+function getRetryAfterSeconds(error: SpotifyApiError) {
+  return typeof error.details === "object" &&
+    error.details !== null &&
+    "retryAfterSeconds" in error.details &&
+    typeof error.details.retryAfterSeconds === "number"
+    ? error.details.retryAfterSeconds
+    : 60;
+}
+
 export default function HomePage() {
   const tokens = getStoredTokens();
   const isLoggedIn = !!tokens;
+  const accessToken = tokens?.accessToken;
 
   if (!isLoggedIn) {
     return <LoginHero />;
   }
 
   const [user, setUser] = useState<SpotifyCurrentUser | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
+  const [profileRateLimited, setProfileRateLimited] = useState(false);
+  const [cachedUserName, setCachedUserName] = useState(
+    () => localStorage.getItem(USER_NAME_KEY) || sessionStorage.getItem(USER_NAME_KEY) || ""
+  );
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
@@ -103,17 +124,67 @@ export default function HomePage() {
   );
 
   useEffect(() => {
+    let ignore = false;
+    let retryTimer: number | undefined;
+
     async function loadUser() {
-      if (!tokens) return;
+      if (cachedUserName) {
+        setUserLoading(false);
+        return;
+      }
+
+      if (!accessToken) {
+        setUserLoading(false);
+        return;
+      }
+
+      setUserLoading(true);
+      setProfileRateLimited(false);
       try {
         const profile = await getCurrentUserProfile();
-        setUser(profile);
+        if (!ignore) {
+          const profileName = getProfileName(profile);
+
+          setUser(profile);
+          if (profileName) {
+            setCachedUserName(profileName);
+            localStorage.setItem(USER_NAME_KEY, profileName);
+            sessionStorage.setItem(USER_NAME_KEY, profileName);
+          }
+        }
       } catch (err) {
-        console.error("Failed to load user", err);
+        if (ignore) return;
+
+        if (err instanceof SpotifyApiError && err.status === 429 && !cachedUserName) {
+          const retryAfterSeconds = getRetryAfterSeconds(err);
+          setProfileRateLimited(true);
+
+          retryTimer = window.setTimeout(() => {
+            if (!ignore) {
+              loadUser();
+            }
+          }, retryAfterSeconds * 1000);
+
+          console.warn(`Spotify profile is rate limited. Retrying in ${retryAfterSeconds} seconds.`);
+        } else {
+          console.error("Failed to load user", err);
+        }
+      } finally {
+        if (!ignore) {
+          setUserLoading(false);
+        }
       }
     }
+
     loadUser();
-  }, [tokens]);
+
+    return () => {
+      ignore = true;
+      if (retryTimer) {
+        window.clearTimeout(retryTimer);
+      }
+    };
+  }, [accessToken, cachedUserName]);
 
   async function onSearch() {
     if (!query.trim()) return;
@@ -144,12 +215,19 @@ export default function HomePage() {
   }
 
   function handleLogout() {
+    localStorage.removeItem(USER_NAME_KEY);
+    sessionStorage.removeItem(USER_NAME_KEY);
     logout();
     window.location.reload();
   }
 
   const resultsCount = results.length;
   const playlistCount = playlistTracks.length;
+  const profileName = getProfileName(user);
+  const userName =
+    profileName ||
+    cachedUserName ||
+    (userLoading && !profileRateLimited ? "Loading profile..." : "Spotify User");
 
   function clearDragOverlay() {
     setActiveTrack(null);
@@ -255,7 +333,7 @@ export default function HomePage() {
       <div className={`${styles.appShell} ${currentTrack ? styles.hasMiniPlayer : ""}`}>
         <Header
           isLoggedIn={isLoggedIn}
-          userName={user?.display_name}
+          userName={userName}
           onLogout={handleLogout}
         />
 

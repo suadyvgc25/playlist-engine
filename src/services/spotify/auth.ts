@@ -11,6 +11,7 @@ const storage = sessionStorage;
 const VERIFIER_KEY = "spotify_pkce_verifier";
 const STATE_KEY = "spotify_oauth_state";
 const TOKENS_KEY = "spotify_tokens";
+const USER_NAME_KEY = "spotify_profile_name";
 
 type TokenResponse = {
   access_token: string;
@@ -96,8 +97,13 @@ export async function finishSpotifyLogin(search: string) {
   const code = params.get("code");
   const returnedState = params.get("state");
   const error = params.get("error");
+  const errorDescription = params.get("error_description");
 
-  if (error) throw new Error(`Spotify error: ${error}`);
+  if (error) {
+    throw new Error(
+      errorDescription ? `Spotify error: ${error} - ${errorDescription}` : `Spotify error: ${error}`
+    );
+  }
   if (!code) throw new Error("Missing authorization code.");
 
   const expectedState = storage.getItem(STATE_KEY);
@@ -198,4 +204,5 @@ export async function requireAccessToken(): Promise<string> {
 
 export function logout() {
   sessionStorage.removeItem(TOKENS_KEY);
+  sessionStorage.removeItem(USER_NAME_KEY);
 }

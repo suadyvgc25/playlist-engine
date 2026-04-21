@@ -26,11 +26,11 @@ function iTunesPreviewProxy() {
   }
 }
 
-export default defineConfig({
-  base: '/playlist-engine/',
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : '/playlist-engine/',
   plugins: [react(), iTunesPreviewProxy()],
   server: {
     host: true,
     port: 5173
   }
-})
+}))

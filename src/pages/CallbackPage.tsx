@@ -18,7 +18,7 @@ export default function CallbackPage() {
         await finishSpotifyLogin(window.location.search);
 
         // Keep the app URL clean after the one-time Spotify callback has been processed.
-        window.history.replaceState({}, document.title, "/");
+        window.history.replaceState({}, document.title, import.meta.env.BASE_URL);
 
         setStatus("Success! Redirecting...");
         navigate("/", { replace: true });

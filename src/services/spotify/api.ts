@@ -32,9 +32,12 @@ export async function spotifyFetch<T>(
   // Preserve Spotify's retry hint so callers can show a useful wait message.
   if (res.status === 429) {
     const retryAfter = res.headers.get("Retry-After");
+    const retryAfterSeconds = retryAfter ? Number(retryAfter) : undefined;
+
     throw new SpotifyApiError(
       `Rate limited by Spotify. Retry after ${retryAfter ?? "a bit"} seconds.`,
-      429
+      429,
+      { retryAfterSeconds }
     );
   }
 
