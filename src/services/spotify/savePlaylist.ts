@@ -1,4 +1,3 @@
-import { getCurrentUserProfile } from "./users";
 import { createPlaylist, addTracksToPlaylist } from "./playlist";
 import type { Track } from "../../types/track";
 
@@ -6,8 +5,6 @@ export async function savePlaylistToSpotify(
   playlistName: string,
   tracks: Track[]
 ) {
-  const user = await getCurrentUserProfile();
-
   const playlist = await createPlaylist({
     name: playlistName.trim(),
     description: "Created with Playlist Engine",
@@ -17,7 +14,7 @@ export async function savePlaylistToSpotify(
   const uris = tracks.map((track) => track.uri);
 
   if (uris.length > 0) {
-    const result = await addTracksToPlaylist(playlist.id, uris);
+    await addTracksToPlaylist(playlist.id, uris);
   }
 
   return playlist;

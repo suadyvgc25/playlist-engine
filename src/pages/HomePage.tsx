@@ -23,7 +23,6 @@ import { formatDuration } from "../utils/formatDuration";
 import SortableTrackItem from "../components/Playlist/SortableTrackItem";
 
 import LoginHero from "../components/LoginHero/LoginHero";
-import AuthButton from "../components/AuthButton/AuthButton";
 import Header from "../components/Header/Header";
 import SearchBar from "../components/SearchBar/SearchBar";
 import SearchResults from "../components/SearchResults/SearchResults";
@@ -206,9 +205,6 @@ export default function HomePage() {
   const resultsCount = results.length;
   const playlistCount = playlistTracks.length;
 
-  const showNoResults =
-    !loading && !error && results.length === 0 && query.trim() !== "";
-
   function handleDragStart(event: any) {
     const activeId = event.active.id.toString();
 
@@ -256,7 +252,6 @@ export default function HomePage() {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over, delta } = event;
-    const trackId = active.id.toString().replace("search-", "");
     
     if (Math.abs(delta.x) < DRAG_THRESHOLD && Math.abs(delta.y) < DRAG_THRESHOLD) {
       setActiveTrack(null);
@@ -461,20 +456,6 @@ export default function HomePage() {
     setIsPlaying(false); 
   }
 
-  function pauseTrack() {
-    audio.pause();
-    setIsPlaying(false);
-  }
-
-  function resumeTrack() {
-    audio.play();
-    setIsPlaying(true);
-  }
-
-  function seek(time: number) {
-    audio.currentTime = time;
-  }
-
   async function playNextTrack() {
     const playbackSource = playbackSourceRef.current;
     const playbackQueue = playbackSource === "playlist" ? playlistTracks : results;
@@ -677,7 +658,6 @@ export default function HomePage() {
         ) : activeTrack ? (
           <SortableTrackItem
             track={activeTrack}
-            onRemove={undefined as any}
             showDragHandle={activeTrackSource === "playlist"} 
           />
         ) : null}
