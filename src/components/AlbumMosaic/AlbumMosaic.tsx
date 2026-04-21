@@ -99,7 +99,7 @@ export default function AlbumMosaic() {
 
     const picked =
       shuffled.find((album) => {
-        // Keep repeated covers from clustering too closely in the mosaic.
+        // Spread duplicate covers across the grid so the background feels varied.
         for (let r = -radius; r <= radius; r++) {
           for (let c = -radius; c <= radius; c++) {
             if (r === 0 && c === 0) continue;
@@ -119,7 +119,7 @@ export default function AlbumMosaic() {
 
         return true;
       }) 
-      // Fall back when every shuffled option is already nearby.
+      // Use the first shuffled cover if the spacing rule cannot be satisfied.
       || shuffled[0];
 
     grid.push(picked);

@@ -39,7 +39,7 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
 
   try {
     const results = await loadITunesResults(query);
-    // iTunes returns broad matches, so prefer the same song and primary artist.
+    // Spotify tracks can map to broad iTunes results; use the title and lead artist to avoid unrelated previews.
     const match = results.find((item) => {
       const isMusic = item.kind === "song";
 

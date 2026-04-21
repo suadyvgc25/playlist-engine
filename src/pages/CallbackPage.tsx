@@ -6,7 +6,7 @@ export default function CallbackPage() {
   const [status, setStatus] = useState("Finishing Spotify login...");
   const navigate = useNavigate();
 
-  // React Strict Mode can run effects twice during development.
+  // Guard the OAuth exchange so development Strict Mode does not spend the same code twice.
   const hasRun = useRef(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export default function CallbackPage() {
       try {
         await finishSpotifyLogin(window.location.search);
 
-        // Drop the temporary OAuth params before returning to the app.
+        // Keep the app URL clean after the one-time Spotify callback has been processed.
         window.history.replaceState({}, document.title, "/");
 
         setStatus("Success! Redirecting...");
