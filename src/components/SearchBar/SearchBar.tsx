@@ -1,4 +1,5 @@
-import { FaSearch } from "react-icons/fa"; // FontAwesome search icon
+import type { FormEvent } from "react";
+import { FaSearch } from "react-icons/fa";
 import styles from "./SearchBar.module.scss";
 
 type Props = {
@@ -13,13 +14,12 @@ export default function SearchBar({
   onQueryChange,
   onSearch,
   loading,
-}: Props) { 
-  
-const handleSubmit = (e: any) => {
-  e.preventDefault();
-  if (!query.trim()) return;
-  onSearch();
-};
+}: Props) {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    onSearch();
+  };
 
   return (
     <form className={styles.searchBar} onSubmit={handleSubmit}>
@@ -34,8 +34,8 @@ const handleSubmit = (e: any) => {
         />
       </div>
       <button
+        type="submit"
         className={styles.button}
-        onClick={onSearch}
         disabled={loading}
       >
         {loading ? "Searching..." : "Search"}
