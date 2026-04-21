@@ -189,7 +189,6 @@ export default function HomePage() {
       setSaveError(null);
 
       const playlist = await savePlaylistToSpotify(playlistName, playlistTracks);
-      console.log("Open playlist here:", playlist.external_urls?.spotify);
       setSaveSuccess(`Playlist Saved: ${playlist.name}`);
 
     } catch (e: any) {
@@ -330,7 +329,6 @@ export default function HomePage() {
     source,
     queueIndex,
   }: PlayTrackOptions = {}) {
-    console.log("TRACK CLICKED:", track);
     // HANDLE MODE CLEANLY (THIS FIXES EVERYTHING)
     if (preview) {
       setIsHoverPreview(true);
@@ -379,9 +377,8 @@ export default function HomePage() {
         console.warn("Preview lookup failed", err);
         previewUrl = undefined;
       }
-        // Cancel if hover changed
+      // Cancel if hover changed
       if (preview && hoverTrackIdRef.current !== track.id) {
-        console.log("Hover cancelled, not playing");
         return false;
       }
     }

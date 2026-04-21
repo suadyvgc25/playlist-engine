@@ -39,7 +39,6 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
 
   try {
     const results = await loadITunesResults(query);
-    console.log("iTunes results:", results);
     // 🎯 Find best match
     const match = results.find((item) => {
       const isMusic = item.kind === "song";
