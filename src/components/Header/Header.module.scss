@@ -1,13 +1,9 @@
-/* Header.module.scss */
-
 .header {
   height: 84px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
-
-  /* Dark gradient header */
   background:
     radial-gradient(900px 120px at 50% 0%, rgba(99, 102, 241, 0.28), transparent 55%),
     linear-gradient(90deg, #0b1220 0%, #0a1324 40%, #0b1220 100%);
@@ -35,7 +31,6 @@
   min-width: 0;
 }
 
-/* Button in Header */
 .authStatus button {
   height: 42px;
   padding: 0 18px;

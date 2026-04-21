@@ -131,9 +131,6 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
         </div>
         
         <div className={styles.trackActions}>
-          {/* <p className={styles.trackDuration}>
-            {formatDuration(track.duration)}
-          </p> */}
           <div className={styles.buttonSlot}>
             {onRemove && (
               <button
