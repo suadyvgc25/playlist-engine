@@ -37,6 +37,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
 
   const isActive = currentTrack?.id === track.id;
   const isActivePlaying = !previewUnavailable && currentTrack?.id === track.id && isPlaying;
+  const showTrackWaveform = isActivePlaying && !isMobileLayout;
   const mobileDragListeners = !isOverlay && isMobileLayout ? listeners : {};
   const handleDragListeners = !isOverlay && !isMobileLayout ? listeners : {};
 
@@ -121,8 +122,8 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
         <div 
           className={styles.waveform}
           style={{
-            opacity: isActivePlaying ? 1 : 0,
-            width: isActivePlaying ? "180px" : "0px",
+            opacity: showTrackWaveform ? 1 : 0,
+            width: showTrackWaveform ? "180px" : "0px",
           }}
         >
             {Array.from({ length: 60 }).map((_, i) => (

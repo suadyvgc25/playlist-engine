@@ -35,6 +35,7 @@ export default function SearchResultTrackItem({
     currentTrack?.id === track.id &&
     isPlaying &&
     (isHoverPreview || !isHoverDevice);
+  const showTrackWaveform = isCurrentPlaying && isHoverDevice;
   const isActive = currentTrack?.id === track.id;
 
   const handleMobilePlayToggle = () => {
@@ -54,7 +55,7 @@ export default function SearchResultTrackItem({
       data-search-track-id={track.id}
       {...attributes}
       {...listeners}
-      className={`${styles.trackItem} ${isActive ? styles.active : ""} ${isCurrentPlaying ? styles.previewing : ""}`}
+      className={`${styles.trackItem} ${isActive ? styles.active : ""} ${showTrackWaveform ? styles.previewing : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
       onMouseEnter={() => {

@@ -360,6 +360,11 @@
     display: none;
   }
 
+  .previewing .trackInfo {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+
   .addButton {
     min-width: 66px;
     height: 34px;
