@@ -2,7 +2,6 @@ const AUTH_URL = "https://accounts.spotify.com/authorize";
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string;
-const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string;
 const SCOPES = (import.meta.env.VITE_SPOTIFY_SCOPES as string)
   .split(" ")
   .filter(Boolean);
@@ -54,9 +53,18 @@ async function createPkcePair() {
   return { verifier, challenge };
 }
 
+function getRedirectUri() {
+  if (import.meta.env.DEV && import.meta.env.VITE_SPOTIFY_REDIRECT_URI) {
+    return import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string;
+  }
+
+  return new URL("callback", `${window.location.origin}${import.meta.env.BASE_URL}`).toString();
+}
+
 export async function startSpotifyLogin() {
   const state = randomString(16);
   const { verifier, challenge } = await createPkcePair();
+  const redirectUri = getRedirectUri();
 
   storage.setItem(VERIFIER_KEY, verifier);
   storage.setItem(STATE_KEY, state);
@@ -64,7 +72,7 @@ export async function startSpotifyLogin() {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: redirectUri,
     scope: SCOPES.join(" "),
     state,
     code_challenge_method: "S256",
@@ -100,11 +108,12 @@ export async function finishSpotifyLogin(search: string) {
   const verifier = storage.getItem(VERIFIER_KEY);
   if (!verifier) throw new Error("Missing PKCE verifier. Please try again.");
 
+  const redirectUri = getRedirectUri();
   const body = new URLSearchParams({
     grant_type: "authorization_code",
     client_id: CLIENT_ID,
     code,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: redirectUri,
     code_verifier: verifier,
   });
 
