@@ -27,6 +27,7 @@ function iTunesPreviewProxy() {
 }
 
 export default defineConfig({
+  base: '/playlist-engine/',
   plugins: [react(), iTunesPreviewProxy()],
   server: {
     host: true,

@@ -66,7 +66,11 @@ function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {
     country: "US",
   });
 
-  return fetch(`/api/itunes/search?${params.toString()}`)
+  const searchUrl = import.meta.env.DEV
+    ? `/api/itunes/search?${params.toString()}`
+    : `https://itunes.apple.com/search?${params.toString()}`;
+
+  return fetch(searchUrl)
     .then((res) => (res.ok ? res.json() : { results: [] }))
     .then((data: ITunesSearchResponse) => data.results ?? [])
     .catch(() => []);
