@@ -4,9 +4,9 @@ const SPOTIFY_BASE_URL = "https://api.spotify.com/v1";
 
 export class SpotifyApiError extends Error {
   status: number;
-  details?: any;
+  details?: unknown;
 
-  constructor(message: string, status: number, details?: any) {
+  constructor(message: string, status: number, details?: unknown) {
     super(message);
     this.status = status;
     this.details = details;
@@ -38,7 +38,7 @@ export async function spotifyFetch<T>(
     );
   }
 
-  let data: any = null;
+  let data: unknown = null;
   const contentType = res.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
     data = await res.json().catch(() => null);

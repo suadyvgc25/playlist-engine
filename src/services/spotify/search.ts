@@ -1,10 +1,11 @@
 import { spotifyFetch } from "./api";
 import { mapSpotifyTrackToTrack } from "./mappers";
 import type { Track } from "../../types/track";
+import type { SpotifyTrackItem } from "./types";
 
 type SpotifySearchResponse = {
   tracks?: {
-    items: any[];
+    items: SpotifyTrackItem[];
   };
 };
 
