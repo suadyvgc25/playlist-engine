@@ -2,6 +2,8 @@ import styles from "./LoginHero.module.scss";
 import { startSpotifyLogin } from "../../services/spotify/auth";
 import AlbumMosaic from "../AlbumMosaic/AlbumMosaic";
 
+const spotifyIconSrc = `${import.meta.env.BASE_URL}spotify-white.svg`;
+
 export default function LoginHero() {
   return (
     <section className={styles.hero}>
@@ -23,7 +25,7 @@ export default function LoginHero() {
 
             <button className={styles.loginButton} onClick={startSpotifyLogin}>
             <img
-                src="/spotify-white.svg"
+                src={spotifyIconSrc}
                 alt="Spotify"
                 className={styles.icon}
             />
