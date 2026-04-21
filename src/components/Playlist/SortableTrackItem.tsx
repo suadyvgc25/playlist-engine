@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import styles from "./Playlist.module.scss";
@@ -16,6 +16,7 @@ type Props = {
 
 export default function SortableTrackItem({ track, onRemove, showDragHandle = true,onPlay,currentTrack,isPlaying, previewUnavailable = false, }: Props) {
   const isOverlay = !onRemove;
+  const touchPlayHandledRef = useRef(false);
   const [isMobileLayout, setIsMobileLayout] = useState(() =>
     typeof window !== "undefined" && window.matchMedia("(max-width: 980px)").matches
   );
@@ -62,6 +63,15 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
       onPlay?.(track, { preview: false });
     }
   };
+
+  const handleDirectPlayPress = () => {
+    touchPlayHandledRef.current = true;
+    handlePlay();
+
+    window.setTimeout(() => {
+      touchPlayHandledRef.current = false;
+    }, 400);
+  };
   
   return (
     <li
@@ -103,9 +113,25 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
                 ? `Pause ${track.name}`
                 : `Play ${track.name}`
             }
-            onPointerDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+
+              if (e.pointerType !== "mouse") {
+                e.preventDefault();
+                handleDirectPlayPress();
+              }
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+
+              if (!touchPlayHandledRef.current) {
+                e.preventDefault();
+                handleDirectPlayPress();
+              }
+            }}
             onClick={(e) => {
               e.stopPropagation();
+              if (touchPlayHandledRef.current) return;
               handlePlay();
             }}
           >

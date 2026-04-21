@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import styles from "./SearchResults.module.scss";
 import type { Track } from "../../types/track";
@@ -24,6 +25,7 @@ export default function SearchResultTrackItem({
   isHoverPreview,
   previewUnavailable = false,
 }: Props) {
+  const touchPlayHandledRef = useRef(false);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `search-${track.id}`,
     data: track,
@@ -47,6 +49,15 @@ export default function SearchResultTrackItem({
     } else {
       onPlay(track, { preview: false });
     }
+  };
+
+  const handleDirectPlayPress = () => {
+    touchPlayHandledRef.current = true;
+    handleMobilePlayToggle();
+
+    window.setTimeout(() => {
+      touchPlayHandledRef.current = false;
+    }, 400);
   };
 
   return (
@@ -90,9 +101,25 @@ export default function SearchResultTrackItem({
                   ? `Pause ${track.name}`
                   : `Play ${track.name}`
               }
-              onPointerDown={(e) => e.stopPropagation()}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+
+                if (e.pointerType !== "mouse") {
+                  e.preventDefault();
+                  handleDirectPlayPress();
+                }
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+
+                if (!touchPlayHandledRef.current) {
+                  e.preventDefault();
+                  handleDirectPlayPress();
+                }
+              }}
               onClick={(e) => {
                 e.stopPropagation();
+                if (touchPlayHandledRef.current) return;
                 handleMobilePlayToggle();
               }}
             >
