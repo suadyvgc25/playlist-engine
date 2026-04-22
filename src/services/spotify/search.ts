@@ -105,8 +105,7 @@ async function fetchPreviewFromDeezer(track: Track): Promise<string | undefined>
   });
 
   try {
-    const data = await fetch(`${DEEZER_SEARCH_URL}?${params.toString()}`)
-      .then((res) => (res.ok ? res.json() : { data: [] })) as DeezerSearchResponse;
+    const data = await loadDeezerResults(params);
 
     const trackName = normalizeSearchText(track.name);
     const leadArtist = normalizeSearchText(track.artist.split(",")[0]);
@@ -130,6 +129,48 @@ async function fetchPreviewFromDeezer(track: Track): Promise<string | undefined>
     console.warn("Failed to fetch Deezer preview", err);
     return undefined;
   }
+}
+
+function loadDeezerResults(params: URLSearchParams): Promise<DeezerSearchResponse> {
+  if (typeof document === "undefined") {
+    return Promise.resolve({ data: [] });
+  }
+
+  return new Promise((resolve) => {
+    const callbackName = `playlistEngineDeezer_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2)}`;
+    const script = document.createElement("script");
+    const callbacks = window as typeof window &
+      Record<string, (data: DeezerSearchResponse) => void>;
+
+    function cleanup() {
+      window.clearTimeout(timeoutId);
+      script.remove();
+      delete callbacks[callbackName];
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      resolve({ data: [] });
+    }, 7000);
+
+    callbacks[callbackName] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+
+    params.set("output", "jsonp");
+    params.set("callback", callbackName);
+    script.async = true;
+    script.src = `${DEEZER_SEARCH_URL}?${params.toString()}`;
+    script.onerror = () => {
+      cleanup();
+      resolve({ data: [] });
+    };
+
+    document.head.append(script);
+  });
 }
 
 function normalizeSearchText(value: string) {
