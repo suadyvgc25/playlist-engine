@@ -20,6 +20,9 @@ type ITunesSearchResponse = {
   results?: ITunesSearchResult[];
 };
 
+const ITUNES_SEARCH_URL =
+  "https://itunes.apple.com/WebObjects/MZStoreServices.woa/ws/wsSearch";
+
 export async function searchTracks(query: string): Promise<Track[]> {
   const q = query.trim();
   if (!q) return [];
@@ -133,7 +136,8 @@ function loadITunesResultsJsonp(params: URLSearchParams): Promise<ITunesSearchRe
 
     params.set("callback", callbackName);
     script.async = true;
-    script.src = `https://itunes.apple.com/search?${params.toString()}`;
+    params.set("output", "json");
+    script.src = `${ITUNES_SEARCH_URL}?${params.toString()}`;
     script.onerror = () => {
       cleanup();
       resolve([]);

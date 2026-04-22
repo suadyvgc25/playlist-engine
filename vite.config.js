@@ -9,7 +9,8 @@ function iTunesPreviewProxy() {
       server.middlewares.use('/api/itunes/search', async (req, res) => {
         try {
           const requestUrl = new URL(req.url ?? '', 'http://localhost')
-          const appleUrl = new URL(`https://itunes.apple.com/search${requestUrl.search}`)
+          const appleUrl = new URL(`https://itunes.apple.com/WebObjects/MZStoreServices.woa/ws/wsSearch${requestUrl.search}`)
+          appleUrl.searchParams.set('output', 'json')
           const data = await fetchITunesJson(appleUrl.toString())
 
           res.statusCode = 200
