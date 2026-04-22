@@ -34,6 +34,7 @@ export function useAudioPlayer({
   const hoverTrackIdRef = useRef<string | null>(null);
   const playbackSourceRef = useRef<PlaybackSource>("search");
   const playbackIndexRef = useRef(-1);
+  const playRequestIdRef = useRef(0);
 
   if (!audioRef.current) {
     const audio = new Audio();
@@ -83,6 +84,9 @@ export function useAudioPlayer({
       queueIndex,
     }: PlayTrackOptions = {}
   ) {
+    const requestId = playRequestIdRef.current + 1;
+    playRequestIdRef.current = requestId;
+
     if (preview) {
       setIsHoverPreview(true);
     } else {
@@ -101,6 +105,9 @@ export function useAudioPlayer({
       } else {
         try {
           await audio.play();
+          if (playRequestIdRef.current !== requestId) {
+            return false;
+          }
           setIsPlaying(true);
         } catch (err) {
           console.warn("Preview playback failed", err);
@@ -146,6 +153,10 @@ export function useAudioPlayer({
       if (preview && hoverTrackIdRef.current !== track.id) {
         return false;
       }
+
+      if (playRequestIdRef.current !== requestId) {
+        return false;
+      }
     }
 
     if (!previewUrl) {
@@ -155,6 +166,10 @@ export function useAudioPlayer({
         clearAudio(audio);
         setTracksWithoutPreviews((prev) => new Set(prev).add(track.id));
       }
+      return false;
+    }
+
+    if (playRequestIdRef.current !== requestId) {
       return false;
     }
 
@@ -172,6 +187,10 @@ export function useAudioPlayer({
     } catch (err) {
       console.warn("Preview playback failed", err);
       setIsPlaying(false);
+      return true;
+    }
+
+    if (playRequestIdRef.current !== requestId) {
       return false;
     }
 
