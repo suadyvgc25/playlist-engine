@@ -87,7 +87,8 @@ function shuffle<T>(array: T[]): T[] {
 export default function AlbumMosaic() {
   const cols = 8;              
   const totalItems = 120;
-  const radius = 5;            
+  const repeatDiameter = 8;
+  const repeatRadius = repeatDiameter / 2;
 
   const grid: string[] = [];
 
@@ -99,10 +100,11 @@ export default function AlbumMosaic() {
 
     const picked =
       shuffled.find((album) => {
-        // Spread duplicate covers across the grid so the background feels varied.
-        for (let r = -radius; r <= radius; r++) {
-          for (let c = -radius; c <= radius; c++) {
+        // Keep repeated covers outside an 8-tile visual diameter.
+        for (let r = -repeatRadius; r <= repeatRadius; r++) {
+          for (let c = -repeatRadius; c <= repeatRadius; c++) {
             if (r === 0 && c === 0) continue;
+            if (Math.hypot(r, c) > repeatRadius) continue;
 
             const checkRow = row + r;
             const checkCol = col + c;
@@ -126,9 +128,9 @@ export default function AlbumMosaic() {
   }
 
   return (
-    <div className={styles.grid}>
+    <div className={styles.grid} aria-hidden="true">
       {grid.map((src, i) => (
-        <img key={i} src={src} />
+        <img key={i} src={src} alt="" loading="lazy" decoding="async" />
       ))}
     </div>
   );

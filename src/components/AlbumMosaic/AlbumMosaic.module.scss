@@ -5,8 +5,9 @@
   display: grid;
   --tile-size: 190px;
   --tile-gap: 20px;
+  --mosaic-columns: 8;
 
-  grid-template-columns: repeat(auto-fill, var(--tile-size));
+  grid-template-columns: repeat(var(--mosaic-columns), var(--tile-size));
   grid-auto-rows: var(--tile-size);
 
   gap: var(--tile-gap);
@@ -41,17 +42,17 @@
 
 @media (max-width: 700px) {
   .grid {
-    --tile-size: 118px;
-    --tile-gap: 12px;
+    --tile-size: 59px;
+    --tile-gap: 6px;
 
-    inset: -160px;
-    padding: 56px;
+    inset: -80px;
+    padding: 28px;
     filter: blur(3px);
     animation-name: driftMobile;
   }
 
   .grid img {
-    border-radius: 10px;
+    border-radius: 6px;
   }
 }
 
