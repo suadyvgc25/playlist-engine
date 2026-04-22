@@ -94,13 +94,7 @@ export function useAudioPlayer({
     const audio = audioRef.current;
     const isSameTrack = currentTrack?.id === track.id;
 
-    if (toggle && isSameTrack) {
-      if (!track.previewUrl && !audio.currentSrc) {
-        clearAudio(audio);
-        setCurrentTrack(track);
-        return false;
-      }
-
+    if (toggle && isSameTrack && (track.previewUrl || audio.currentSrc)) {
       if (isPlaying) {
         audio.pause();
         setIsPlaying(false);
@@ -122,6 +116,21 @@ export function useAudioPlayer({
     } else {
       audio.pause();
       setIsPlaying(false);
+
+      const nextSource =
+        source ??
+        (playlistTracks.some((playlistTrack) => playlistTrack.id === track.id)
+          ? "playlist"
+          : "search");
+      const nextQueue = nextSource === "playlist" ? playlistTracks : results;
+      const nextIndex =
+        typeof queueIndex === "number"
+          ? queueIndex
+          : nextQueue.findIndex((queueTrack) => queueTrack.id === track.id);
+
+      playbackSourceRef.current = nextSource;
+      playbackIndexRef.current = nextIndex;
+      setCurrentTrack(track);
     }
 
     let previewUrl = track.previewUrl;
@@ -164,22 +173,6 @@ export function useAudioPlayer({
       console.warn("Preview playback failed", err);
       setIsPlaying(false);
       return false;
-    }
-
-    if (!preview) {
-      const nextSource =
-        source ??
-        (playlistTracks.some((playlistTrack) => playlistTrack.id === track.id)
-          ? "playlist"
-          : "search");
-      const nextQueue = nextSource === "playlist" ? playlistTracks : results;
-      const nextIndex =
-        typeof queueIndex === "number"
-          ? queueIndex
-          : nextQueue.findIndex((queueTrack) => queueTrack.id === track.id);
-
-      playbackSourceRef.current = nextSource;
-      playbackIndexRef.current = nextIndex;
     }
 
     setTracksWithoutPreviews((prev) => {
