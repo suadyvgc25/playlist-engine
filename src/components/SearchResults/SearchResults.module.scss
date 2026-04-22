@@ -365,10 +365,10 @@
   }
 
   .trackItem {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     min-height: 74px;
     height: 74px;
-    padding: 10px 12px;
+    padding: 10px 124px 10px 12px;
     border-radius: 12px;
     touch-action: pan-y;
   }
@@ -380,8 +380,11 @@
   }
 
   .trackActions {
+    position: absolute;
+    right: 12px;
     gap: 8px;
-    min-width: 132px;
+    width: 110px;
+    justify-content: flex-end;
   }
 
   .playerSlot,
