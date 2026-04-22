@@ -25,7 +25,8 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 - Sass modules
 - React Router
 - Spotify Web API
-- iTunes Search API for audio previews
+- Deezer public search API for mobile-safe audio previews
+- Optional iTunes Search API proxy fallback for local/server-backed preview lookup
 - `@dnd-kit` for drag and drop
 
 ## Getting Started
@@ -114,13 +115,38 @@ Builds and deploys the `dist` folder with `gh-pages`.
 
 ## Audio Preview Notes
 
-Spotify search results do not always include playable preview URLs. To support previews, the app searches iTunes for a matching song and uses the returned preview URL when available.
+Spotify search results do not always include playable preview URLs. The app therefore resolves preview audio through a fallback pipeline instead of relying only on Spotify's `preview_url` field.
 
-During local development, `vite.config.js` mounts `/api/itunes/search` so previews behave like they do in production.
+The current preview lookup order is:
 
-For production, `api/itunes/search.js` provides the same endpoint as a Vercel serverless function. This avoids browser redirect and CORS issues from direct iTunes requests.
+1. Use Spotify's `preview_url` when Spotify provides one.
+2. Search Deezer for a matching song and artist, then use Deezer's direct MP3 preview URL.
+3. Optionally fall back to an iTunes Search API proxy when a proxy is available.
 
-GitHub Pages is a static host, so it cannot run this API route. If you deploy with `gh-pages`, Spotify search can still work, but iTunes previews may fail. For full preview support, deploy to Vercel or another host that can run `/api/itunes/search`.
+### Why Deezer Uses JSONP
+
+Mobile Safari and iOS Chrome have two important constraints that affect this app:
+
+- Direct Apple/iTunes metadata requests from an iPhone browser can be redirected to `musics://...` URLs. Browser JavaScript cannot fetch those app-deep-link URLs, so preview lookup fails before the app receives an audio URL.
+- Deezer's JSON API can return valid preview MP3 URLs, but iPhone Safari blocks normal `fetch()` calls from the GitHub Pages origin because of CORS.
+
+To support mobile playback on a static GitHub Pages deployment, `src/services/spotify/search.ts` uses Deezer's JSONP callback mode for preview lookup. JSONP loads the response through a temporary `<script>` tag instead of `fetch()`, so it is not blocked by the same CORS checks. The response includes direct MP3 preview URLs that can then be assigned to the app's audio player.
+
+This JSONP path is intentional. Replacing it with a normal `fetch("https://api.deezer.com/search...")` call can make previews work on desktop while breaking fresh searches on real iPhones.
+
+### iTunes Proxy Fallback
+
+During local development, `vite.config.js` mounts `/api/itunes/search` as a server-side proxy for iTunes lookup. This keeps Apple metadata requests out of the browser and avoids the iPhone `musics://` redirect issue.
+
+The `api/itunes/search.js` file can also be used as a serverless function on a host like Vercel. GitHub Pages is static and cannot run that API route. For GitHub Pages, the mobile-safe Deezer JSONP lookup is the production path.
+
+If a production host provides an iTunes proxy endpoint, set `VITE_ITUNES_PROXY_URL` to that endpoint at build time. Without that variable, production skips the iTunes fallback and relies on Spotify plus Deezer previews.
+
+### Mobile Playback Behavior
+
+iPhone audio playback is stricter than desktop playback. The app pre-resolves preview URLs during search when possible, then the tap on a play button starts playback from an already known audio URL. If a track has no usable preview, the app marks it as unavailable and skips it when using next-track playback.
+
+When debugging mobile preview issues, inspect the app on the real iPhone with Safari Web Inspector. Desktop responsive mode can be misleading because it may keep preview URLs that were already resolved before switching to an iPhone viewport.
 
 ## Project Structure
 
@@ -141,8 +167,8 @@ src/
 - `src/hooks/useAudioPlayer.ts` handles preview lookup, playback state, pause/play behavior, and next-track logic.
 - `src/hooks/usePlaylist.ts` handles playlist state and saving to Spotify.
 - `src/services/spotify/auth.ts` handles Spotify login, token storage, refresh, and logout.
-- `src/services/spotify/search.ts` handles Spotify search and iTunes preview lookup.
-- `api/itunes/search.js` provides the production iTunes preview proxy.
+- `src/services/spotify/search.ts` handles Spotify search plus Spotify, Deezer JSONP, and optional iTunes-proxy preview lookup.
+- `api/itunes/search.js` provides an optional iTunes preview proxy for server-capable hosts.
 - `vite.config.js` configures React and mounts the local iTunes preview proxy during development.
 
 ## Production Checklist
@@ -159,5 +185,7 @@ Also confirm:
 
 - Spotify redirect URI matches the production URL.
 - Required Spotify scopes are configured.
-- The iTunes preview proxy is available in the production hosting environment.
+- Real iPhone preview playback works after a fresh search, not only after desktop previews were already resolved.
+- The production bundle is not making direct browser requests to Apple/iTunes metadata URLs.
+- GitHub Pages preview lookup uses Deezer JSONP, or another production host provides `VITE_ITUNES_PROXY_URL`.
 - Mobile and desktop playback controls still work after deployment.
