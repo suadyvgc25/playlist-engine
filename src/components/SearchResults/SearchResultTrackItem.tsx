@@ -126,7 +126,7 @@ export default function SearchResultTrackItem({
               }}
             >
               <span aria-hidden="true">
-                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
+                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "II" : "▶️"}
               </span>
             </button>
           </div>
@@ -170,7 +170,7 @@ export default function SearchResultTrackItem({
             handleMobilePlayToggle();
           }}
         >
-          {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶"}
+          {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "II" : "▶"}
         </button>
 
         <button

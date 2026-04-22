@@ -134,7 +134,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
               handlePlay();
             }}
           >
-            {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶️"}
+            {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "II" : "▶️"}
           </button>
         </div>
 
@@ -176,7 +176,7 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
                 }}
                 className={styles.mobilePreviewButton}
               >
-                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶"}
+                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "II" : "▶"}
               </button>
             )}
 
