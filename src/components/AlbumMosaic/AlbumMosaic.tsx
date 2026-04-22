@@ -85,8 +85,8 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export default function AlbumMosaic() {
-  const cols = 8;              
-  const totalItems = 120;
+  const cols = 12;              
+  const totalItems = 168;
   const repeatDiameter = 8;
   const repeatRadius = repeatDiameter / 2;
 

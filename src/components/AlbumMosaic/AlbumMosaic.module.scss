@@ -5,7 +5,7 @@
   display: grid;
   --tile-size: 190px;
   --tile-gap: 20px;
-  --mosaic-columns: 8;
+  --mosaic-columns: 12;
 
   grid-template-columns: repeat(var(--mosaic-columns), var(--tile-size));
   grid-auto-rows: var(--tile-size);
