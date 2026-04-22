@@ -92,12 +92,53 @@ function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {
     country: "US",
   });
 
-  const searchUrl = import.meta.env.DEV
-    ? `/api/itunes/search?${params.toString()}`
-    : `https://itunes.apple.com/search?${params.toString()}`;
+  if (!import.meta.env.DEV) {
+    return loadITunesResultsJsonp(params);
+  }
 
-  return fetch(searchUrl)
+  return fetch(`/api/itunes/search?${params.toString()}`)
     .then((res) => (res.ok ? res.json() : { results: [] }))
     .then((data: ITunesSearchResponse) => data.results ?? [])
     .catch(() => []);
+}
+
+function loadITunesResultsJsonp(params: URLSearchParams): Promise<ITunesSearchResult[]> {
+  if (typeof document === "undefined") {
+    return Promise.resolve([]);
+  }
+
+  return new Promise((resolve) => {
+    const callbackName = `playlistEngineITunes_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2)}`;
+    const script = document.createElement("script");
+    const callbacks = window as typeof window &
+      Record<string, (data: ITunesSearchResponse) => void>;
+
+    function cleanup() {
+      window.clearTimeout(timeoutId);
+      script.remove();
+      delete callbacks[callbackName];
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      resolve([]);
+    }, 7000);
+
+    callbacks[callbackName] = (data) => {
+      cleanup();
+      resolve(data.results ?? []);
+    };
+
+    params.set("callback", callbackName);
+    script.async = true;
+    script.src = `https://itunes.apple.com/search?${params.toString()}`;
+    script.onerror = () => {
+      cleanup();
+      resolve([]);
+    };
+
+    document.head.append(script);
+  });
 }
