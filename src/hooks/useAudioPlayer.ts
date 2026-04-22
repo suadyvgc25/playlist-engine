@@ -36,7 +36,10 @@ export function useAudioPlayer({
   const playbackIndexRef = useRef(-1);
 
   if (!audioRef.current) {
-    audioRef.current = new Audio();
+    const audio = new Audio();
+    audio.preload = "auto";
+    audio.setAttribute("playsinline", "true");
+    audioRef.current = audio;
   }
 
   function clearAudio(audio: HTMLAudioElement) {
@@ -117,7 +120,8 @@ export function useAudioPlayer({
     if (preview) {
       hoverTrackIdRef.current = track.id;
     } else {
-      clearAudio(audio);
+      audio.pause();
+      setIsPlaying(false);
     }
 
     let previewUrl = track.previewUrl;
@@ -148,6 +152,12 @@ export function useAudioPlayer({
     audio.pause();
     audio.src = previewUrl;
     audio.currentTime = 0;
+
+    setCurrentTrack({
+      ...track,
+      previewUrl,
+    });
+
     try {
       await audio.play();
     } catch (err) {
@@ -155,11 +165,6 @@ export function useAudioPlayer({
       setIsPlaying(false);
       return false;
     }
-
-    setCurrentTrack({
-      ...track,
-      previewUrl,
-    });
 
     if (!preview) {
       const nextSource =
