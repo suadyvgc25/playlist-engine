@@ -43,7 +43,7 @@ export default function SearchResultTrackItem({
   const isActive = currentTrack?.id === track.id;
 
   const handleMobilePlayToggle = () => {
-    if (isHoverDevice || previewUnavailable) return;
+    if (previewUnavailable) return;
 
     const isSameTrack = currentTrack?.id === track.id;
     if (isSameTrack) {
@@ -152,6 +152,26 @@ export default function SearchResultTrackItem({
             </span>
           </div>
         )}
+
+        <button
+          type="button"
+          className={styles.mobilePreviewButton}
+          disabled={previewUnavailable}
+          aria-label={
+            previewUnavailable
+              ? `No preview available for ${track.name}`
+              : currentTrack?.id === track.id && isPlaying
+              ? `Pause ${track.name}`
+              : `Play ${track.name}`
+          }
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleMobilePlayToggle();
+          }}
+        >
+          {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶"}
+        </button>
 
         <button
           className={styles.addButton}

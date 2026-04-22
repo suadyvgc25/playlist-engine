@@ -160,6 +160,28 @@ export default function SortableTrackItem({ track, onRemove, showDragHandle = tr
           <div className={styles.buttonSlot}>
             {onRemove && (
               <button
+                type="button"
+                disabled={previewUnavailable}
+                aria-label={
+                  previewUnavailable
+                    ? `No preview available for ${track.name}`
+                    : currentTrack?.id === track.id && isPlaying
+                    ? `Pause ${track.name}`
+                    : `Play ${track.name}`
+                }
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePlay();
+                }}
+                className={styles.mobilePreviewButton}
+              >
+                {!previewUnavailable && currentTrack?.id === track.id && isPlaying ? "⏸" : "▶"}
+              </button>
+            )}
+
+            {onRemove && (
+              <button
                 onPointerDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
