@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { fetchPreviewFromiTunes } from "../services/spotify/search";
+import { fetchTrackPreview } from "../services/spotify/search";
 import type { Track } from "../types/track";
 
 export type PlaybackSource = "search" | "playlist";
@@ -144,7 +144,7 @@ export function useAudioPlayer({
 
     if (!previewUrl) {
       try {
-        previewUrl = await fetchPreviewFromiTunes(track);
+        previewUrl = await fetchTrackPreview(track);
       } catch (err) {
         console.warn("Preview lookup failed", err);
         previewUrl = undefined;

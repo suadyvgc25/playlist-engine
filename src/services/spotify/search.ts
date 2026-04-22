@@ -20,8 +20,19 @@ type ITunesSearchResponse = {
   results?: ITunesSearchResult[];
 };
 
-const ITUNES_SEARCH_URL =
-  "https://itunes.apple.com/WebObjects/MZStoreServices.woa/ws/wsSearch";
+type DeezerTrackResult = {
+  title?: string;
+  artist?: {
+    name?: string;
+  };
+  preview?: string;
+};
+
+type DeezerSearchResponse = {
+  data?: DeezerTrackResult[];
+};
+
+const DEEZER_SEARCH_URL = "https://api.deezer.com/search";
 
 export async function searchTracks(query: string): Promise<Track[]> {
   const q = query.trim();
@@ -41,16 +52,25 @@ export async function searchTracks(query: string): Promise<Track[]> {
     tracks.map(async (track) => {
       if (track.previewUrl) return track;
 
-      const previewUrl = await fetchPreviewFromiTunes(track);
+      const previewUrl = await fetchTrackPreview(track);
       return previewUrl ? { ...track, previewUrl } : track;
     })
   );
 }
 
-export async function fetchPreviewFromiTunes(track: Track): Promise<string | undefined> {
+export async function fetchTrackPreview(track: Track): Promise<string | undefined> {
   const query = `${track.name} ${track.artist}`;
 
   try {
+    const deezerPreviewUrl = await fetchPreviewFromDeezer(track);
+    if (deezerPreviewUrl) {
+      return deezerPreviewUrl;
+    }
+
+    if (!canUseITunesLookup()) {
+      return undefined;
+    }
+
     const results = await loadITunesResults(query);
     // Spotify tracks can map to broad iTunes results; use the title and lead artist to avoid unrelated previews.
     const trackName = normalizeSearchText(track.name);
@@ -73,7 +93,41 @@ export async function fetchPreviewFromiTunes(track: Track): Promise<string | und
 
     return match?.previewUrl ?? results.find((item) => item.kind === "song" && item.previewUrl)?.previewUrl;
   } catch (err) {
-    console.warn("Failed to fetch iTunes preview", err);
+    console.warn("Failed to fetch track preview", err);
+    return undefined;
+  }
+}
+
+async function fetchPreviewFromDeezer(track: Track): Promise<string | undefined> {
+  const params = new URLSearchParams({
+    q: `${track.name} ${track.artist}`,
+    limit: "5",
+  });
+
+  try {
+    const data = await fetch(`${DEEZER_SEARCH_URL}?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : { data: [] })) as DeezerSearchResponse;
+
+    const trackName = normalizeSearchText(track.name);
+    const leadArtist = normalizeSearchText(track.artist.split(",")[0]);
+    const results = data.data ?? [];
+
+    const match = results.find((item) => {
+      const resultName = normalizeSearchText(item.title ?? "");
+      const resultArtist = normalizeSearchText(item.artist?.name ?? "");
+      const nameMatch =
+        resultName.includes(trackName) ||
+        trackName.includes(resultName);
+      const artistMatch =
+        resultArtist.includes(leadArtist) ||
+        leadArtist.includes(resultArtist);
+
+      return nameMatch && artistMatch && item.preview;
+    });
+
+    return match?.preview ?? results.find((item) => item.preview)?.preview;
+  } catch (err) {
+    console.warn("Failed to fetch Deezer preview", err);
     return undefined;
   }
 }
@@ -96,7 +150,7 @@ function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {
   });
 
   if (!import.meta.env.DEV) {
-    return loadITunesResultsJsonp(params);
+    return loadITunesResultsFromProxy(params);
   }
 
   return fetch(`/api/itunes/search?${params.toString()}`)
@@ -105,44 +159,23 @@ function loadITunesResults(query: string): Promise<ITunesSearchResult[]> {
     .catch(() => []);
 }
 
-function loadITunesResultsJsonp(params: URLSearchParams): Promise<ITunesSearchResult[]> {
-  if (typeof document === "undefined") {
+function canUseITunesLookup() {
+  return import.meta.env.DEV || Boolean(import.meta.env.VITE_ITUNES_PROXY_URL);
+}
+
+function loadITunesResultsFromProxy(params: URLSearchParams): Promise<ITunesSearchResult[]> {
+  const proxyUrl = import.meta.env.VITE_ITUNES_PROXY_URL as string | undefined;
+  if (!proxyUrl) {
     return Promise.resolve([]);
   }
 
-  return new Promise((resolve) => {
-    const callbackName = `playlistEngineITunes_${Date.now()}_${Math.random()
-      .toString(36)
-      .slice(2)}`;
-    const script = document.createElement("script");
-    const callbacks = window as typeof window &
-      Record<string, (data: ITunesSearchResponse) => void>;
-
-    function cleanup() {
-      window.clearTimeout(timeoutId);
-      script.remove();
-      delete callbacks[callbackName];
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      cleanup();
-      resolve([]);
-    }, 7000);
-
-    callbacks[callbackName] = (data) => {
-      cleanup();
-      resolve(data.results ?? []);
-    };
-
-    params.set("callback", callbackName);
-    script.async = true;
-    params.set("output", "json");
-    script.src = `${ITUNES_SEARCH_URL}?${params.toString()}`;
-    script.onerror = () => {
-      cleanup();
-      resolve([]);
-    };
-
-    document.head.append(script);
+  const requestUrl = new URL(proxyUrl);
+  params.forEach((value, key) => {
+    requestUrl.searchParams.set(key, value);
   });
+
+  return fetch(requestUrl.toString())
+    .then((res) => (res.ok ? res.json() : { results: [] }))
+    .then((data: ITunesSearchResponse) => data.results ?? [])
+    .catch(() => []);
 }
