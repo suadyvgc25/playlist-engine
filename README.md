@@ -35,7 +35,7 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 - `@dnd-kit` for drag and drop
 
 ## Live Demo
-[View the live app]([url](https://suadyvgc25.github.io/playlist-engine/))
+[View the live app](https://suadyvgc25.github.io/playlist-engine)
 
 ## Screenshots
 ![Playlist Engine desktop screenshot](docs/screenshots/playlist-engine-desktop.png)
