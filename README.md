@@ -42,8 +42,6 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 ![Playlist Engine desktop Search Results screenshot](docs/screenshots/playlist-engine-desktop-searchresults.png)
 ![Playlist Engine desktop Playlist screenshot](docs/screenshots/playlist-engine-desktop-playlist.png)
 ![Playlist Engine desktop Preview Play screenshot](docs/screenshots/playlist-engine-desktop-previewplay.png)
-![Playlist Engine mobile login screenshot](docs/screenshots/playlist-engine-mobile-login.png)
-
 
 <p>
   <img src="docs/screenshots/playlist-engine-mobile-login.png" alt="Playlist Engine mobile login screenshot" width="250" />
