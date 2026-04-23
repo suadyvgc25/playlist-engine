@@ -43,10 +43,15 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 ![Playlist Engine desktop Playlist screenshot](docs/screenshots/playlist-engine-desktop-playlist.png)
 ![Playlist Engine desktop Preview Play screenshot](docs/screenshots/playlist-engine-desktop-previewplay.png)
 ![Playlist Engine mobile login screenshot](docs/screenshots/playlist-engine-mobile-login.png)
-![Playlist Engine mobile Search Results screenshot](docs/screenshots/playlist-engine-mobile-searchresults.png)
-![Playlist Engine mobile Playlist screenshot](docs/screenshots/playlist-engine-mobile-playlist.png)
-![Playlist Engine mobile Play Preview screenshot](docs/screenshots/playlist-engine-mobile-playpreview.png)
-![Playlist Engine mobile Added to Playlist screenshot](docs/screenshots/playlist-engine-mobile-addedtoplaylist.png)
+
+
+<p>
+  <img src="docs/screenshots/playlist-engine-mobile-login.png" alt="Playlist Engine mobile login screenshot" width="250" />
+  <img src="docs/screenshots/playlist-engine-mobile-searchresults.png" alt="Playlist Engine mobile search results screenshot" width="250" />
+  <img src="docs/screenshots/playlist-engine-mobile-playpreview.png" alt="Playlist Engine mobile preview playback screenshot" width="250" />
+  <img src="docs/screenshots/playlist-engine-mobile-addedtoplaylist.png" alt="Playlist Engine mobile added to playlist screenshot" width="250" />
+  <img src="docs/screenshots/playlist-engine-mobile-playlist.png" alt="Playlist Engine mobile playlist screenshot" width="250" />
+</p>
 
 ## Technical Highlights
 ### Preview Player State
