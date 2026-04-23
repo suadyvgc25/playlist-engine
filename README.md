@@ -1,8 +1,8 @@
 # Playlist Engine
 
-Playlist Engine is a React and TypeScript app for searching Spotify tracks, previewing songs, building a playlist, reordering tracks with drag and drop, and saving the finished playlist back to Spotify.
+Playlist Engine is a Spotify-powered playlist builder that lets users search tracks, preview songs, arrange playlist order with drag and drop, and save the final mix back to Spotify. It is designed to make playlist creation feel faster and more interactive than building directly inside a streaming app.
 
-The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE, and `@dnd-kit` for drag and drop.
+I built it to solve a simple product problem: adding songs to a playlist is much easier when you can preview tracks, compare options, and shape the flow before saving anything. Instead of forcing users to guess from titles alone, Playlist Engine gives them a lightweight workspace for auditioning songs and organizing a playlist in one place.
 
 ## Features
 
@@ -34,7 +34,7 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 - Optional iTunes Search API proxy fallback for local/server-backed preview lookup
 - `@dnd-kit` for drag and drop
 
-# Live Demo
+## Live Demo
 [View the live app]([url](https://suadyvgc25.github.io/playlist-engine/))
 
 ## Screenshots
