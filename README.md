@@ -22,6 +22,12 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 - Progressive search loading with deduped results and preserved scroll position.
 - Responsive desktop, tablet, and mobile layouts.
 
+## Mobile Experience
+
+- Tap-to-play preview playback with no hover dependency.
+- Optimized touch interactions for playback, adding tracks, and drag behavior.
+- Responsive layout with an adaptive mobile login background.
+
 ## Tech Stack
 
 - React 19
