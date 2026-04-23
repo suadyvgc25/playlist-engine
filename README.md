@@ -1,29 +1,53 @@
 # Playlist Engine
 
+Build better playlists by hearing songs before you add them.
+
 Playlist Engine is a Spotify-powered playlist builder that lets users search tracks, preview songs, arrange playlist order with drag and drop, and save the final mix back to Spotify. It is designed to make playlist creation feel faster and more interactive than building directly inside a streaming app.
 
-I built it to solve a simple product problem: adding songs to a playlist is much easier when you can preview tracks, compare options, and shape the flow before saving anything. Instead of forcing users to guess from titles alone, Playlist Engine gives them a lightweight workspace for auditioning songs and organizing a playlist in one place.
+## Live Demo
+[View the live app](https://suadyvgc25.github.io/playlist-engine)
+
+## The Problem
+Creating playlists in streaming apps often involves guessing how songs sound or how they will flow together. This leads to disjointed playlists and a frustrating trial-and-error process.
+
+## The Solution
+
+Playlist Engine introduces a seamless preview workflow:
+
+- Instantly listen to tracks before adding them
+- Compare songs side-by-side
+- Build and refine playlists in one focused workspace
 
 ## Features
 
-- Log in with Spotify using the PKCE OAuth flow.
-- Search Spotify tracks by song, artist, or keyword.
-- Show the top 20 unique search results first, then load more results in 10-track batches.
-- Cap visible search results at 50 unique tracks per search.
-- Keep search results free of duplicate tracks, including duplicate-looking versions returned across Spotify pages.
-- Mark tracks that are already in the playlist so users do not add duplicates.
-- Preview tracks from search results and playlist items.
-- Use a mobile mini-player with play/pause and next controls.
-- Skip tracks that do not have a playable preview.
-- Add search results to a playlist.
-- Reorder playlist tracks with drag and drop.
-- Remove tracks or clear the whole playlist.
-- Save the playlist to the logged-in Spotify account.
-- Progressive search loading with deduped results and preserved scroll position.
-- Responsive desktop, tablet, and mobile layouts.
+### Authentication
+- Log in with Spotify using the PKCE OAuth flow
+- Secure token handling with no client secret exposed
+- Seamless connection to the user’s Spotify account
 
-## Mobile Experience
+### Search & Discovery
+- Search Spotify tracks by song, artist, or keyword
+- Show top 20 unique results, then load more in batches of 10
+- Cap results at 50 unique tracks per search
+- Remove duplicate and duplicate-looking tracks across results
+- Preserve scroll position when loading more
 
+### Playback & Preview
+- Preview songs directly from search results and playlist
+- Hover over search results on desktop to instantly preview tracks
+- Tap play controls on mobile for touch-friendly preview playback
+- Mobile-friendly mini player with play/pause and next controls
+- Skip tracks with no playable preview
+- Seamless playback across search and playlist
+
+### Playlist Management
+- Add tracks from search results
+- Reorder songs with drag and drop
+- Remove individual tracks or clear the playlist
+- Prevent duplicate additions with visual “Added” state
+- Save playlists to Spotify
+
+### Mobile Experience
 - Tap-to-play preview playback with no hover dependency.
 - Optimized touch interactions for playback, adding tracks, and drag behavior.
 - Responsive layout with an adaptive mobile login background.
@@ -35,13 +59,19 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 - Vite
 - Sass modules
 - React Router
-- Spotify Web API
-- Deezer public search API for mobile-safe audio previews
+- Spotify Web API(PKCE OAuth flow)
+- Deezer public search API for mobile-safe audio previews (preview fallback)
 - Optional iTunes Search API proxy fallback for local/server-backed preview lookup
 - `@dnd-kit` for drag and drop
 
-## Live Demo
-[View the live app](https://suadyvgc25.github.io/playlist-engine)
+## How It Works
+
+1. User searches for tracks via Spotify API
+2. Results render with preview capability
+3. User previews tracks (hover on desktop, tap on mobile)
+4. Tracks are added and arranged in a playlist
+5. A centralized preview player syncs playback globally
+6. Final playlist is saved to Spotify
 
 ## Screenshots
 ![Playlist Engine desktop Login screenshot](docs/screenshots/playlist-engine-desktop-login.png)
@@ -56,6 +86,9 @@ I built it to solve a simple product problem: adding songs to a playlist is much
   <img src="docs/screenshots/playlist-engine-mobile-addedtoplaylist.png" alt="Playlist Engine mobile added to playlist screenshot" width="250" />
   <img src="docs/screenshots/playlist-engine-mobile-playlist.png" alt="Playlist Engine mobile playlist screenshot" width="250" />
 </p>
+
+## Demo
+(Add a short GIF or video here showing search → preview → drag → play)
 
 ## Technical Highlights
 ### Preview Player State
