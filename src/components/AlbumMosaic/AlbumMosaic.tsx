@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import styles from "./AlbumMosaic.module.scss";
 
 import album1 from "../../assets/albums/album1.webp";
@@ -35,7 +37,9 @@ import album32 from "../../assets/albums/album32.webp";
 import album33 from "../../assets/albums/album33.webp";
 import album34 from "../../assets/albums/album34.webp";
 import album35 from "../../assets/albums/album35.webp";
+import mobileLoginBackground from "../../assets/albums/mobile-login-background-mix.webp";
 
+const mobileMosaicQuery = "(max-width: 700px)";
 
 const albums = [
   album1,
@@ -59,7 +63,7 @@ const albums = [
   album19,
   album20,
   album21,
-  album22,   
+  album22,
   album23,
   album24,
   album25,
@@ -75,6 +79,26 @@ const albums = [
   album35
 ];
 
+function getIsMobileMosaic() {
+  return typeof window !== "undefined" && window.matchMedia(mobileMosaicQuery).matches;
+}
+
+function useIsMobileMosaic() {
+  const [isMobileMosaic, setIsMobileMosaic] = useState(getIsMobileMosaic);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(mobileMosaicQuery);
+    const handleChange = () => setIsMobileMosaic(mediaQuery.matches);
+
+    handleChange();
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  return isMobileMosaic;
+}
+
 function shuffle<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -85,7 +109,22 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 export default function AlbumMosaic() {
-  const cols = 12;              
+  const isMobileMosaic = useIsMobileMosaic();
+
+  if (isMobileMosaic) {
+    return (
+      <img
+        className={styles.mobileBackground}
+        src={mobileLoginBackground}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+      />
+    );
+  }
+
+  const cols = 12;
   const totalItems = 168;
   const repeatDiameter = 8;
   const repeatRadius = repeatDiameter / 2;
