@@ -41,6 +41,85 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 ![Playlist Engine desktop screenshot](docs/screenshots/playlist-engine-desktop.png)
 ![Playlist Engine mobile screenshot](docs/screenshots/playlist-engine-mobile.png)
 
+## Technical Highlights
+### Preview Player State
+The preview player is centralized in **src/hooks/useAudioPlayer.ts**. Instead of letting each row manage its own audio element, the app uses a single Audio instance plus shared React state for:
+
+* currentTrack
+* isPlaying
+* isHoverPreview
+* tracksWithoutPreviews
+  
+This keeps playback synchronized between search results, playlist items, and the mobile mini player. The hook also tracks playback source and queue position so the app can move to the next playable track without losing context.
+
+A request ID guard prevents race conditions when users move quickly between tracks. If multiple preview lookups resolve out of order, only the latest request is allowed to update playback state.
+
+### Hover Vs Mobile Interactions
+Desktop and mobile use different interaction models on purpose:
+
+* On hover-capable devices, search result previews start on mouseenter and stop on mouseleave.
+* On touch devices, previews are triggered through explicit play buttons instead of hover.
+* Touch-specific handlers prevent accidental double-fires between pointer, touch, and click events.
+* Drag listeners are attached differently on mobile vs desktop so reordering and playback do not fight each other.
+
+That logic lives mainly in:
+
+* src/components/SearchResults/SearchResultTrackItem.tsx
+* src/components/Playlist/SortableTrackItem.tsx
+  
+### Preventing Layout Shift
+A big part of the polish was making dynamic UI changes feel stable. I solved layout shifting in a few ways:
+
+* Reserved fixed-width UI slots for durations, action buttons, and waveform areas so rows do not jump when playback state changes.
+* Restored the search panel scroll position after loading more results so the list does not snap back to the top.
+* Stored drag overlay dimensions at drag start so the overlay matches the source row instead of resizing mid-drag.
+* Added mobile-only spacing for the mini player using CSS custom properties so the fixed player does not cover scrollable content.
+  
+Relevant files:
+
+* src/pages/HomePage.tsx
+* src/App.module.scss
+* src/components/SearchResults/SearchResults.module.scss
+* src/components/Playlist/Playlist.module.scss
+  
+### Component Structure
+I split the app by responsibility so UI, state, and API logic stay isolated:
+
+* pages/: route-level orchestration such as search, drag-and-drop context, and layout state.
+* hooks/: reusable stateful logic like audio playback and playlist saving.
+* components/: presentational UI pieces such as search results, playlist items, header, and mini player.
+* services/spotify/: auth, API calls, track mapping, playlist creation, and preview lookup.
+* utils/ and types/: shared formatting helpers and TypeScript models.
+  
+This structure made it easier to keep the React components focused while moving side effects and platform-specific logic into hooks and services.
+
+## Challenges I Solved
+
+### 1. Preview Availability Across Devices
+Spotify does not always provide a usable preview_url, especially in a way that works consistently across mobile browsers. To make previews reliable, I built a fallback pipeline:
+
+1. Use Spotify's native preview URL when available.
+2. Try Deezer for a matching preview.
+3. Optionally fall back to an iTunes proxy when the host supports it.
+   
+This gave the app a much better chance of finding playable previews without making the user think about the complexity behind it.
+
+### 2. Duplicate-Looking Search Results
+Spotify search can return duplicate-looking tracks across albums, remasters, and alternate releases. I handled this in two layers:
+
+API-level deduping in src/services/spotify/search.ts
+Client-level deduping when appending new result batches in src/pages/HomePage.tsx
+This keeps search results cleaner and makes the playlist-building experience feel more intentional.
+
+### 3. Touch-Friendly Drag And Playback
+Reordering songs and previewing them both depend on user gestures, so mobile needed extra care. I tuned drag sensor thresholds, delayed touch activation, and separated mobile play controls from drag handles so users can tap confidently without triggering unintended drag behavior.
+
+## What I'd Improve Next
+
+* Add playlist persistence so in-progress work survives refreshes.
+* Add recommendations based on the current playlist.
+* Add keyboard shortcuts and stronger accessibility support for drag-and-drop flows.
+* Add automated tests around audio state, search deduping, and playlist save behavior.
 
 ## Getting Started
 
