@@ -11,7 +11,7 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 - Show the top 20 unique search results first, then load more results in 10-track batches.
 - Cap visible search results at 50 unique tracks per search.
 - Keep search results free of duplicate tracks, including duplicate-looking versions returned across Spotify pages.
-- Mark search results that are already in the playlist.
+- Mark tracks that are already in the playlist so users do not add duplicates.
 - Preview tracks from search results and playlist items.
 - Use a mobile mini-player with play/pause and next controls.
 - Skip tracks that do not have a playable preview.
@@ -19,6 +19,7 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 - Reorder playlist tracks with drag and drop.
 - Remove tracks or clear the whole playlist.
 - Save the playlist to the logged-in Spotify account.
+- Progressive search loading with deduped results and preserved scroll position.
 - Responsive desktop, tablet, and mobile layouts.
 
 ## Tech Stack
@@ -32,6 +33,14 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 - Deezer public search API for mobile-safe audio previews
 - Optional iTunes Search API proxy fallback for local/server-backed preview lookup
 - `@dnd-kit` for drag and drop
+
+# Live Demo
+[View the live app]([url](https://suadyvgc25.github.io/playlist-engine/))
+
+## Screenshots
+![Playlist Engine desktop screenshot](docs/screenshots/playlist-engine-desktop.png)
+![Playlist Engine mobile screenshot](docs/screenshots/playlist-engine-mobile.png)
+
 
 ## Getting Started
 
