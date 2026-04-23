@@ -205,6 +205,58 @@ npm run deploy
 
 Builds and deploys the `dist` folder with `gh-pages`.
 
+## Project Structure
+
+```text
+src/
+  components/       Reusable UI pieces such as SearchBar, Playlist, MiniPlayer, and LoginHero
+  hooks/            Playlist and audio playback state
+  pages/            Route-level screens
+  services/spotify/ Spotify auth, API requests, search, playlist saving, and mapping helpers
+  styles/           Shared global styles
+  types/            Shared TypeScript types
+  utils/            Formatting helpers
+```
+
+## Key Files
+
+- `src/pages/HomePage.tsx` coordinates search, playlist building, drag and drop, and the mini-player.
+- `src/hooks/useAudioPlayer.ts` handles preview lookup, playback state, pause/play behavior, and next-track logic.
+- `src/hooks/usePlaylist.ts` handles playlist state and saving to Spotify.
+- `src/services/spotify/auth.ts` handles Spotify login, token storage, refresh, and logout.
+- `src/services/spotify/search.ts` handles Spotify search plus Spotify, Deezer JSONP, and optional iTunes-proxy preview lookup.
+- `api/itunes/search.js` provides an optional iTunes preview proxy for server-capable hosts.
+- `vite.config.js` configures React and mounts the local iTunes preview proxy during development.
+
+## Production Checklist
+
+Before shipping or deploying, run:
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+Also confirm:
+
+- Spotify redirect URI matches the production URL.
+- Required Spotify scopes are configured.
+- Search results show Load More until 50 unique tracks are displayed, using broad searches like `a` or `love`.
+- Search results do not show obvious duplicates after multiple Load More actions.
+- Already-added search results are visibly marked as Added.
+- Real iPhone preview playback works after a fresh search, not only after desktop previews were already resolved.
+- The production bundle is not making direct browser requests to Apple/iTunes metadata URLs.
+- GitHub Pages preview lookup uses Deezer JSONP, or another production host provides `VITE_ITUNES_PROXY_URL`.
+- Mobile and desktop playback controls still work after deployment.
+
+## Production Notes
+* The app uses Spotify OAuth with PKCE.
+* Search results are loaded progressively instead of traditional pagination.
+* Search result deduping happens both during API mapping and during client-side append operations.
+* Mobile playback uses explicit controls and a mini player rather than hover interactions.
+* Preview lookup relies on Spotify first, then fallback providers when needed.
+
 ## Audio Preview Notes
 
 Spotify search results do not always include playable preview URLs. The app therefore resolves preview audio through a fallback pipeline instead of relying only on Spotify's `preview_url` field.
@@ -276,47 +328,4 @@ Load More appends tracks to the existing list instead of replacing the result se
 
 Tracks already added to the playlist remain visible in search results, but their add button changes to Added and becomes disabled. This gives the user clear feedback without hiding search context or changing result order.
 
-## Project Structure
 
-```text
-src/
-  components/       Reusable UI pieces such as SearchBar, Playlist, MiniPlayer, and LoginHero
-  hooks/            Playlist and audio playback state
-  pages/            Route-level screens
-  services/spotify/ Spotify auth, API requests, search, playlist saving, and mapping helpers
-  styles/           Shared global styles
-  types/            Shared TypeScript types
-  utils/            Formatting helpers
-```
-
-## Key Files
-
-- `src/pages/HomePage.tsx` coordinates search, playlist building, drag and drop, and the mini-player.
-- `src/hooks/useAudioPlayer.ts` handles preview lookup, playback state, pause/play behavior, and next-track logic.
-- `src/hooks/usePlaylist.ts` handles playlist state and saving to Spotify.
-- `src/services/spotify/auth.ts` handles Spotify login, token storage, refresh, and logout.
-- `src/services/spotify/search.ts` handles Spotify search plus Spotify, Deezer JSONP, and optional iTunes-proxy preview lookup.
-- `api/itunes/search.js` provides an optional iTunes preview proxy for server-capable hosts.
-- `vite.config.js` configures React and mounts the local iTunes preview proxy during development.
-
-## Production Checklist
-
-Before shipping or deploying, run:
-
-```bash
-npm run typecheck
-npm run lint
-npm run build
-```
-
-Also confirm:
-
-- Spotify redirect URI matches the production URL.
-- Required Spotify scopes are configured.
-- Search results show Load More until 50 unique tracks are displayed, using broad searches like `a` or `love`.
-- Search results do not show obvious duplicates after multiple Load More actions.
-- Already-added search results are visibly marked as Added.
-- Real iPhone preview playback works after a fresh search, not only after desktop previews were already resolved.
-- The production bundle is not making direct browser requests to Apple/iTunes metadata URLs.
-- GitHub Pages preview lookup uses Deezer JSONP, or another production host provides `VITE_ITUNES_PROXY_URL`.
-- Mobile and desktop playback controls still work after deployment.
