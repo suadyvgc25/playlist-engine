@@ -38,8 +38,15 @@ I built it to solve a simple product problem: adding songs to a playlist is much
 [View the live app](https://suadyvgc25.github.io/playlist-engine)
 
 ## Screenshots
-![Playlist Engine desktop login screenshot](docs/screenshots/playlist-engine-desktop-login.png)
+![Playlist Engine desktop Login screenshot](docs/screenshots/playlist-engine-desktop-login.png)
+![Playlist Engine desktop Search Results screenshot](docs/screenshots/playlist-engine-desktop-searchresults.png)
+![Playlist Engine desktop Playlist screenshot](docs/screenshots/playlist-engine-desktop-playlist.png)
+![Playlist Engine desktop Preview Play screenshot](docs/screenshots/playlist-engine-desktop-previewplay.png)
 ![Playlist Engine mobile login screenshot](docs/screenshots/playlist-engine-mobile-login.png)
+![Playlist Engine mobile Search Results screenshot](docs/screenshots/playlist-engine-mobile-searchresults.png)
+![Playlist Engine mobile Playlist screenshot](docs/screenshots/playlist-engine-mobile-playlist.png)
+![Playlist Engine mobile Play Preview screenshot](docs/screenshots/playlist-engine-mobile-playpreview.png)
+![Playlist Engine mobile Added to Playlist screenshot](docs/screenshots/playlist-engine-mobile-addedtoplaylist.png)
 
 ## Technical Highlights
 ### Preview Player State
