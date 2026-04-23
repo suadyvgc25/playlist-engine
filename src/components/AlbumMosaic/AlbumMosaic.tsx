@@ -37,7 +37,7 @@ import album32 from "../../assets/albums/album32.webp";
 import album33 from "../../assets/albums/album33.webp";
 import album34 from "../../assets/albums/album34.webp";
 import album35 from "../../assets/albums/album35.webp";
-import mobileLoginBackground from "../../assets/albums/mobile-login-background-mix.webp";
+import mobileLoginBackground from "../../assets/albums/mobile-login-background-final.webp";
 
 const mobileMosaicQuery = "(max-width: 700px)";
 
@@ -113,14 +113,16 @@ export default function AlbumMosaic() {
 
   if (isMobileMosaic) {
     return (
-      <img
-        className={styles.mobileBackground}
-        src={mobileLoginBackground}
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        decoding="async"
-      />
+      <div className={styles.mobileBackgroundFrame} aria-hidden="true">
+        <img
+          className={styles.mobileBackground}
+          src={mobileLoginBackground}
+          alt=""
+          loading="eager"
+          decoding="async"
+        />
+        <div className={styles.mobileBackgroundVeil} />
+      </div>
     );
   }
 
