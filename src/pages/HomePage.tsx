@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Track } from "../types/track";
 import type { SpotifyCurrentUser } from "../services/spotify/users";
 
 import { getCurrentUserProfile } from "../services/spotify/users";
-import { searchTracks } from "../services/spotify/search";
+import {
+  DEFAULT_TRACK_SEARCH_LIMIT,
+  MAX_TRACK_SEARCH_LIMIT,
+  getTrackDedupeKey,
+  searchTracks,
+} from "../services/spotify/search";
 import { logout, getStoredTokens } from "../services/spotify/auth";
 import { SpotifyApiError } from "../services/spotify/api";
 
@@ -36,6 +41,8 @@ import styles from "../App.module.scss";
 
 const DRAG_THRESHOLD = 5;
 const USER_NAME_KEY = "spotify_profile_name";
+const SEARCH_LOAD_MORE_LIMIT = 10;
+const SPOTIFY_SEARCH_SCAN_LIMIT = 1000;
 
 function getErrorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
@@ -54,6 +61,79 @@ function getRetryAfterSeconds(error: SpotifyApiError) {
     : 60;
 }
 
+function createTrackSeenState(tracks: Track[]) {
+  return {
+    ids: new Set(tracks.map((track) => track.id)),
+    keys: new Set(tracks.map(getTrackDedupeKey)),
+  };
+}
+
+function appendUniqueTracks(existingTracks: Track[], incomingTracks: Track[]) {
+  const seen = createTrackSeenState(existingTracks);
+  const uniqueTracks = [...existingTracks];
+
+  incomingTracks.forEach((track) => {
+    const trackKey = getTrackDedupeKey(track);
+
+    if (seen.ids.has(track.id) || seen.keys.has(trackKey)) return;
+
+    seen.ids.add(track.id);
+    seen.keys.add(trackKey);
+    uniqueTracks.push(track);
+  });
+
+  return uniqueTracks;
+}
+
+async function loadUniqueSearchTracks(
+  searchQuery: string,
+  targetLimit: number,
+  startOffset: number,
+  existingTracks: Track[]
+) {
+  const seen = createTrackSeenState(existingTracks);
+  const uniqueTracks: Track[] = [];
+  let nextOffset = startOffset;
+  let exhausted = false;
+
+  while (uniqueTracks.length < targetLimit && nextOffset < SPOTIFY_SEARCH_SCAN_LIMIT) {
+    const requestLimit = Math.min(
+      SEARCH_LOAD_MORE_LIMIT,
+      SPOTIFY_SEARCH_SCAN_LIMIT - nextOffset
+    );
+    const batch = await searchTracks(searchQuery, {
+      limit: requestLimit,
+      offset: nextOffset,
+    });
+
+    nextOffset += requestLimit;
+
+    if (batch.length === 0) {
+      exhausted = true;
+      break;
+    }
+
+    batch.forEach((track) => {
+      const trackKey = getTrackDedupeKey(track);
+
+      if (seen.ids.has(track.id) || seen.keys.has(trackKey)) return;
+
+      seen.ids.add(track.id);
+      seen.keys.add(trackKey);
+      uniqueTracks.push(track);
+    });
+  }
+
+  return {
+    tracks: uniqueTracks.slice(0, targetLimit),
+    nextOffset,
+    hasMore:
+      !exhausted &&
+      existingTracks.length + uniqueTracks.length < MAX_TRACK_SEARCH_LIMIT &&
+      nextOffset < SPOTIFY_SEARCH_SCAN_LIMIT,
+  };
+}
+
 export default function HomePage() {
   const tokens = getStoredTokens();
   const isLoggedIn = !!tokens;
@@ -70,13 +150,18 @@ export default function HomePage() {
     () => localStorage.getItem(USER_NAME_KEY) || sessionStorage.getItem(USER_NAME_KEY) || ""
   );
   const [query, setQuery] = useState("");
+  const [searchedQuery, setSearchedQuery] = useState("");
+  const [searchOffset, setSearchOffset] = useState(0);
+  const [hasMoreSearchResults, setHasMoreSearchResults] = useState(false);
   const [results, setResults] = useState<Track[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<"results" | "playlist">("results");
   const [activeTrack, setActiveTrack] = useState<Track | null>(null);
   const [activeTrackSource, setActiveTrackSource] = useState<PlaybackSource | null>(null);
   const [activeOverlaySize, setActiveOverlaySize] = useState<{ width: number; height: number } | null>(null);
+  const searchPanelRef = useRef<HTMLElement | null>(null);
 
   const {
     playlistName,
@@ -187,20 +272,78 @@ export default function HomePage() {
   }, [accessToken, cachedUserName]);
 
   async function onSearch() {
-    if (!query.trim()) return;
+    const searchQuery = query.trim();
+    if (!searchQuery) return;
 
     setError(null);
     setLoading(true);
+    setLoadingMore(false);
     setMobileView("results");
 
     try {
-      const tracks = await searchTracks(query);
-      setResults(tracks);
+      const searchResult = await loadUniqueSearchTracks(
+        searchQuery,
+        DEFAULT_TRACK_SEARCH_LIMIT,
+        0,
+        []
+      );
+
+      setSearchedQuery(searchQuery);
+      setResults(searchResult.tracks);
+      setSearchOffset(searchResult.nextOffset);
+      setHasMoreSearchResults(searchResult.hasMore);
     } catch (err) {
       setError(getErrorMessage(err, "Something went wrong."));
       setResults([]);
+      setHasMoreSearchResults(false);
+      setSearchOffset(0);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadMoreResults() {
+    if (loadingMore || !hasMoreSearchResults) return;
+
+    const searchQuery = searchedQuery || query.trim();
+    if (!searchQuery) return;
+
+    const remainingResultSlots = MAX_TRACK_SEARCH_LIMIT - results.length;
+    if (remainingResultSlots <= 0) {
+      setHasMoreSearchResults(false);
+      return;
+    }
+
+    const panel = searchPanelRef.current;
+    const scrollTop = panel?.scrollTop;
+
+    setError(null);
+    setLoadingMore(true);
+
+    try {
+      const searchResult = await loadUniqueSearchTracks(
+        searchQuery,
+        Math.min(SEARCH_LOAD_MORE_LIMIT, remainingResultSlots),
+        searchOffset,
+        results
+      );
+      const nextResults = appendUniqueTracks(results, searchResult.tracks);
+
+      setResults(nextResults);
+      setSearchOffset(searchResult.nextOffset);
+      setHasMoreSearchResults(
+        searchResult.hasMore && nextResults.length < MAX_TRACK_SEARCH_LIMIT
+      );
+
+      window.requestAnimationFrame(() => {
+        if (panel && typeof scrollTop === "number") {
+          panel.scrollTop = scrollTop;
+        }
+      });
+    } catch (err) {
+      setError(getErrorMessage(err, "Something went wrong."));
+    } finally {
+      setLoadingMore(false);
     }
   }
 
@@ -223,6 +366,7 @@ export default function HomePage() {
 
   const resultsCount = results.length;
   const playlistCount = playlistTracks.length;
+  const playlistTrackIds = new Set(playlistTracks.map((track) => track.id));
   const profileName = getProfileName(user);
   const userName =
     profileName ||
@@ -356,6 +500,7 @@ export default function HomePage() {
           </div>
 
           <section
+            ref={searchPanelRef}
             className={`${styles.leftCol} ${mobileView === "results" ? styles.mobilePanelActive : styles.mobilePanelHidden}`}
             aria-label="Search and results"
           >
@@ -385,6 +530,10 @@ export default function HomePage() {
                   stopPreview={stopPreview}
                   isHoverPreview={isHoverPreview}
                   tracksWithoutPreviews={tracksWithoutPreviews}
+                  playlistTrackIds={playlistTrackIds}
+                  hasMore={hasMoreSearchResults}
+                  loadingMore={loadingMore}
+                  onLoadMore={loadMoreResults}
                 />
               </>
             )}

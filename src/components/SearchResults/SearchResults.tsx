@@ -15,6 +15,10 @@ type Props = {
   stopPreview: () => void;
   isHoverPreview: boolean;
   tracksWithoutPreviews: Set<string>;
+  playlistTrackIds: Set<string>;
+  hasMore: boolean;
+  loadingMore: boolean;
+  onLoadMore: () => void;
 };
 
 export default function SearchResults({
@@ -27,6 +31,10 @@ export default function SearchResults({
   stopPreview,
   isHoverPreview,
   tracksWithoutPreviews,
+  playlistTrackIds,
+  hasMore,
+  loadingMore,
+  onLoadMore,
 }: Props) {
   if (tracks.length === 0) {
     return null;
@@ -53,9 +61,21 @@ export default function SearchResults({
             stopPreview={stopPreview}
             isHoverPreview={isHoverPreview}
             previewUnavailable={tracksWithoutPreviews.has(track.id)}
+            isAdded={playlistTrackIds.has(track.id)}
           />
         ))}
       </ul>
+
+      {hasMore && (
+        <button
+          type="button"
+          className={styles.loadMoreButton}
+          onClick={onLoadMore}
+          disabled={loadingMore}
+        >
+          {loadingMore ? "Loading..." : "Load More"}
+        </button>
+      )}
     </div>
   );
 }

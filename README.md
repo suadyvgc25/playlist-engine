@@ -8,6 +8,10 @@ The app is built with Vite, React Router, Sass modules, Spotify OAuth with PKCE,
 
 - Log in with Spotify using the PKCE OAuth flow.
 - Search Spotify tracks by song, artist, or keyword.
+- Show the top 20 unique search results first, then load more results in 10-track batches.
+- Cap visible search results at 50 unique tracks per search.
+- Keep search results free of duplicate tracks, including duplicate-looking versions returned across Spotify pages.
+- Mark search results that are already in the playlist.
 - Preview tracks from search results and playlist items.
 - Use a mobile mini-player with play/pause and next controls.
 - Skip tracks that do not have a playable preview.
@@ -148,6 +152,42 @@ iPhone audio playback is stricter than desktop playback. The app pre-resolves pr
 
 When debugging mobile preview issues, inspect the app on the real iPhone with Safari Web Inspector. Desktop responsive mode can be misleading because it may keep preview URLs that were already resolved before switching to an iPhone viewport.
 
+## Search Result Loading
+
+The search experience is designed around a mobile-first browsing pattern:
+
+1. A new search shows the first 20 unique tracks.
+2. The user can press Load More to append the next 10 unique tracks.
+3. The visible result list stops at 50 unique tracks.
+4. The Load More button disappears when the app has displayed 50 unique tracks or Spotify stops returning additional tracks.
+
+This replaced the earlier result-count selector because choosing between 20, 25, and 50 results was less natural on mobile. A progressive Load More pattern keeps the first screen fast and easier to scan, while still letting users browse deeper when the first set is not enough.
+
+### Why Spotify Is Paged Internally
+
+Spotify's Search API is requested in small pages. The app keeps each Spotify request at 10 tracks, then combines pages in the client. This avoids sending an oversized request and gives the UI predictable batches:
+
+- Initial search: enough 10-track Spotify pages to collect up to 20 unique tracks.
+- Load More: additional 10-track pages until up to 10 more unique tracks are found.
+- Maximum visible results: 50 unique tracks.
+
+The app may scan deeper than 50 raw Spotify results. This is intentional. The visible cap is 50 unique tracks, not "the first 50 raw objects Spotify returned." Spotify can return duplicates, alternate releases, remasters, clean/explicit variants, or the same song appearing on different albums. If the app stopped after inspecting only 50 raw results, deduping could leave the user with far fewer than 50 visible songs.
+
+### Duplicate Handling
+
+Search result deduping happens in two layers:
+
+- `src/services/spotify/search.ts` dedupes each Spotify response by Spotify track ID and by a normalized track-title-and-artist key.
+- `src/pages/HomePage.tsx` dedupes again when appending new pages so duplicates cannot reappear across Load More actions.
+
+The ID check catches exact Spotify duplicates. The normalized name-and-artist check catches cases where Spotify gives different IDs to what looks like the same song in the UI, such as the same track appearing on a single, album, compilation, or deluxe edition.
+
+### Scroll And Playback Behavior
+
+Load More appends tracks to the existing list instead of replacing the result set. This keeps the active preview track stable whenever possible because the current track object remains in the rendered results. The search panel also restores its previous scroll position after new results are appended, so pressing Load More does not jump the user back to the top.
+
+Tracks already added to the playlist remain visible in search results, but their add button changes to Added and becomes disabled. This gives the user clear feedback without hiding search context or changing result order.
+
 ## Project Structure
 
 ```text
@@ -185,6 +225,9 @@ Also confirm:
 
 - Spotify redirect URI matches the production URL.
 - Required Spotify scopes are configured.
+- Search results show Load More until 50 unique tracks are displayed, using broad searches like `a` or `love`.
+- Search results do not show obvious duplicates after multiple Load More actions.
+- Already-added search results are visibly marked as Added.
 - Real iPhone preview playback works after a fresh search, not only after desktop previews were already resolved.
 - The production bundle is not making direct browser requests to Apple/iTunes metadata URLs.
 - GitHub Pages preview lookup uses Deezer JSONP, or another production host provides `VITE_ITUNES_PROXY_URL`.

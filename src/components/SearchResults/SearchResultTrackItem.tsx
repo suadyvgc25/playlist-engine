@@ -13,6 +13,7 @@ type Props = {
   stopPreview: () => void;
   isHoverPreview: boolean;
   previewUnavailable?: boolean;
+  isAdded?: boolean;
 };
 
 export default function SearchResultTrackItem({
@@ -24,6 +25,7 @@ export default function SearchResultTrackItem({
   stopPreview,
   isHoverPreview,
   previewUnavailable = false,
+  isAdded = false,
 }: Props) {
   const touchPlayHandledRef = useRef(false);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -68,7 +70,7 @@ export default function SearchResultTrackItem({
       data-search-track-id={track.id}
       {...attributes}
       {...rowDragListeners}
-      className={`${styles.trackItem} ${isActive ? styles.active : ""} ${showTrackWaveform ? styles.previewing : ""}`}
+      className={`${styles.trackItem} ${isActive ? styles.active : ""} ${showTrackWaveform ? styles.previewing : ""} ${isAdded ? styles.added : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1 }}
 
       onMouseEnter={() => {
@@ -175,13 +177,16 @@ export default function SearchResultTrackItem({
 
         <button
           className={styles.addButton}
+          disabled={isAdded}
+          aria-label={isAdded ? `${track.name} is already in your playlist` : `Add ${track.name}`}
           onClick={(e) => {
             e.stopPropagation();
+            if (isAdded) return;
             onAdd(track);
           }}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          + Add
+          {isAdded ? "Added" : "+ Add"}
         </button>
       </div>
     </li>

@@ -9,6 +9,11 @@ type SpotifySearchResponse = {
   };
 };
 
+type SearchTracksOptions = {
+  limit?: number;
+  offset?: number;
+};
+
 type ITunesSearchResult = {
   kind?: string;
   trackName?: string;
@@ -33,19 +38,58 @@ type DeezerSearchResponse = {
 };
 
 const DEEZER_SEARCH_URL = "https://api.deezer.com/search";
+export const DEFAULT_TRACK_SEARCH_LIMIT = 20;
+export const MAX_TRACK_SEARCH_LIMIT = 50;
+const SPOTIFY_SEARCH_PAGE_LIMIT = 10;
 
-export async function searchTracks(query: string): Promise<Track[]> {
+function normalizeTrackSearchLimit(limit: number) {
+  if (!Number.isFinite(limit)) return DEFAULT_TRACK_SEARCH_LIMIT;
+
+  return Math.min(Math.max(Math.trunc(limit), 1), MAX_TRACK_SEARCH_LIMIT);
+}
+
+export function getTrackDedupeKey(track: Track) {
+  return `${normalizeSearchText(track.name)}:${normalizeSearchText(track.artist)}`;
+}
+
+function getSpotifyTrackDedupeKey(item: SpotifyTrackItem) {
+  const artistNames = item.artists?.map((artist) => artist.name).join(", ") ?? "";
+
+  return `${normalizeSearchText(item.name)}:${normalizeSearchText(artistNames)}`;
+}
+
+export async function searchTracks(
+  query: string,
+  options: SearchTracksOptions = {}
+): Promise<Track[]> {
   const q = query.trim();
   if (!q) return [];
 
-  const params = new URLSearchParams({
-    q,
-    type: "track",
-    limit: "10",
-  });
+  const requestedLimit = normalizeTrackSearchLimit(options.limit ?? DEFAULT_TRACK_SEARCH_LIMIT);
+  const requestedOffset = Math.max(Math.trunc(options.offset ?? 0), 0);
+  const pageRequests = Array.from(
+    { length: Math.ceil(requestedLimit / SPOTIFY_SEARCH_PAGE_LIMIT) },
+    (_, index) => {
+      const pageOffset = requestedOffset + index * SPOTIFY_SEARCH_PAGE_LIMIT;
+      const pageLimit = Math.min(
+        SPOTIFY_SEARCH_PAGE_LIMIT,
+        requestedLimit - index * SPOTIFY_SEARCH_PAGE_LIMIT
+      );
+      const params = new URLSearchParams({
+        q,
+        type: "track",
+        limit: pageLimit.toString(),
+        offset: pageOffset.toString(),
+      });
 
-  const data = await spotifyFetch<SpotifySearchResponse>(`/search?${params.toString()}`);
-  const items = data.tracks?.items ?? [];
+      return spotifyFetch<SpotifySearchResponse>(`/search?${params.toString()}`);
+    }
+  );
+
+  const pages = await Promise.all(pageRequests);
+  const items = dedupeSpotifyTrackItems(
+    pages.flatMap((data) => data.tracks?.items ?? [])
+  ).slice(0, requestedLimit);
   const tracks = items.map(mapSpotifyTrackToTrack);
 
   return Promise.all(
@@ -56,6 +100,21 @@ export async function searchTracks(query: string): Promise<Track[]> {
       return previewUrl ? { ...track, previewUrl } : track;
     })
   );
+}
+
+function dedupeSpotifyTrackItems(items: SpotifyTrackItem[]) {
+  const seenIds = new Set<string>();
+  const seenTrackKeys = new Set<string>();
+
+  return items.filter((item) => {
+    const trackKey = getSpotifyTrackDedupeKey(item);
+
+    if (seenIds.has(item.id) || seenTrackKeys.has(trackKey)) return false;
+
+    seenIds.add(item.id);
+    seenTrackKeys.add(trackKey);
+    return true;
+  });
 }
 
 export async function fetchTrackPreview(track: Track): Promise<string | undefined> {
