@@ -151,7 +151,7 @@ I split the app by responsibility so UI, state, and API logic stay isolated:
   
 This structure made it easier to keep the React components focused while moving side effects and platform-specific logic into hooks and services.
 
-## Challenges I Solved
+## Challenges & Solutions
 
 ### 1. Preview Availability Across Devices
 Spotify does not always provide a usable preview_url, especially in a way that works consistently across mobile browsers. To make previews reliable, I built a fallback pipeline:
