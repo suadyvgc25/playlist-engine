@@ -165,9 +165,8 @@ This gave the app a much better chance of finding playable previews without maki
 ### 2. Duplicate-Looking Search Results
 Spotify search can return duplicate-looking tracks across albums, remasters, and alternate releases. I handled this in two layers:
 
-API-level deduping in src/services/spotify/search.ts
-Client-level deduping when appending new result batches in src/pages/HomePage.tsx
-This keeps search results cleaner and makes the playlist-building experience feel more intentional.
+* API-level deduping in src/services/spotify/search.ts
+* Client-level deduping when appending new result batches in src/pages/HomePage.tsx. This keeps search results cleaner and makes the playlist-building experience feel more intentional.
 
 ### 3. Touch-Friendly Drag And Playback
 Reordering songs and previewing them both depend on user gestures, so mobile needed extra care. I tuned drag sensor thresholds, delayed touch activation, and separated mobile play controls from drag handles so users can tap confidently without triggering unintended drag behavior.
