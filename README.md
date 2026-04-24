@@ -172,12 +172,20 @@ This keeps search results cleaner and makes the playlist-building experience fee
 ### 3. Touch-Friendly Drag And Playback
 Reordering songs and previewing them both depend on user gestures, so mobile needed extra care. I tuned drag sensor thresholds, delayed touch activation, and separated mobile play controls from drag handles so users can tap confidently without triggering unintended drag behavior.
 
+## What I Learned
+
+* Managing shared state across independent UI systems
+* Designing different interaction models for mobile vs desktop
+* Handling unreliable third-party APIs with fallback strategies
+* Preventing UI instability in highly interactive components
+
 ## What I'd Improve Next
 
 * Add playlist persistence so in-progress work survives refreshes.
 * Add recommendations based on the current playlist.
 * Add keyboard shortcuts and stronger accessibility support for drag-and-drop flows.
 * Add automated tests around audio state, search deduping, and playlist save behavior.
+* AI-generated playlist naming
 
 ## Getting Started
 
