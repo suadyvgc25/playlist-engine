@@ -90,7 +90,14 @@ Playlist Engine introduces a seamless preview workflow:
 ## Demo
 (Add a short GIF or video here showing search → preview → drag → play)
 
-## Technical Highlights
+## Technical Highlights ( Quick Overview)
+
+- Centralized audio playback system using a shared Audio instance and global state
+- Cross-device interaction model (hover on desktop, tap on mobile)
+- Progressive search loading with deduplication and scroll preservation
+- Mobile-safe preview fallback pipeline (Spotify → Deezer → optional iTunes proxy)
+- Layout stability techniques to prevent UI shifting during dynamic interactions
+  
 ### Preview Player State
 The preview player is centralized in **src/hooks/useAudioPlayer.ts**. Instead of letting each row manage its own audio element, the app uses a single Audio instance plus shared React state for:
 
