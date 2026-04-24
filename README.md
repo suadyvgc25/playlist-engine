@@ -90,7 +90,9 @@ Playlist Engine introduces a seamless preview workflow:
 ## Demo
 (Add a short GIF or video here showing search → preview → drag → play)
 
-## Technical Highlights ( Quick Overview)
+## Technical Highlights 
+
+### Overview
 
 - Centralized audio playback system using a shared Audio instance and global state
 - Cross-device interaction model (hover on desktop, tap on mobile)
